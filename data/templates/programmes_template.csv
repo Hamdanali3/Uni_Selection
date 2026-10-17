@@ -1,0 +1,6 @@
+id,institution_id,campus_id,name,degree_level,discipline_id,duration_years,study_mode,official_url,last_verified_at,min_percentage,required_subjects,effective_session
+prog-nust-cs,nust,cmp-nust-isb,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://seecs.nust.edu.pk/program/bs-computer-science,2026-09-20,60.0,Mathematics;Physics,2025-2026
+prog-nust-se,nust,cmp-nust-isb,BS Software Engineering,Undergraduate,disc-se,4.0,Full-Time,https://seecs.nust.edu.pk/program/bs-software-engineering,2026-09-20,60.0,Mathematics;Physics,2025-2026
+prog-lums-cs,lums,cmp-lums-dha,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://sbasse.lums.edu.pk/department/computer-science,2026-09-18,70.0,Mathematics;Sciences,2025-2026
+prog-fast-cs,fast-nu,cmp-fast-isb,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://nu.edu.pk/Program/BS(CS),2026-09-22,50.0,Mathematics,2025-2026
+prog-aku-mbbs,aku,,Bachelor of Medicine Bachelor of Surgery (MBBS),Undergraduate,disc-mbbs,5.0,Full-Time,https://www.aku.edu/mcpk/programmes/undergraduate/mbbs,2026-09-12,65.0,Biology;Chemistry,2025-2026
