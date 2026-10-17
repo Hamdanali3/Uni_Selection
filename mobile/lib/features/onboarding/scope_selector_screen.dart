@@ -82,7 +82,7 @@ class ScopeSelectorScreen extends StatelessWidget {
                 icon: Icons.flag_rounded,
                 isRecommended: true,
                 onTap: () async {
-                  await repository.setScope('national');
+                  await repository.completeOnboarding('national');
                   onScopeSelected();
                 },
               ),
@@ -97,7 +97,7 @@ class ScopeSelectorScreen extends StatelessWidget {
                 icon: Icons.public_rounded,
                 isRecommended: false,
                 onTap: () async {
-                  await repository.setScope('international');
+                  await repository.completeOnboarding('international');
                   onScopeSelected();
                 },
               ),

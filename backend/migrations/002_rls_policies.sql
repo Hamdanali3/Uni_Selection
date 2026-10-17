@@ -80,7 +80,37 @@ CREATE POLICY "Admins full access programmes" ON programmes
         coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
     );
 
+CREATE POLICY "Admins full access campuses" ON campuses
+    FOR ALL USING (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
+    );
+
+CREATE POLICY "Admins full access eligibility_rules" ON eligibility_rules
+    FOR ALL USING (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
+    );
+
+CREATE POLICY "Admins full access admissions" ON admissions
+    FOR ALL USING (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
+    );
+
+CREATE POLICY "Admins full access fee_records" ON fee_records
+    FOR ALL USING (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
+    );
+
+CREATE POLICY "Admins full access sources" ON sources
+    FOR ALL USING (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
+    );
+
 CREATE POLICY "Admins read audit logs" ON admin_audit_log
     FOR SELECT USING (
         coalesce(auth.jwt()->'app_metadata'->>'role', '') = 'admin'
+    );
+
+CREATE POLICY "Admins insert audit logs" ON admin_audit_log
+    FOR INSERT WITH CHECK (
+        coalesce(auth.jwt()->'app_metadata'->>'role', '') IN ('admin', 'editor')
     );

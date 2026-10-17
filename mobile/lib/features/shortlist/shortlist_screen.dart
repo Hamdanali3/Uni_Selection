@@ -3,15 +3,16 @@ import '../../core/constants/app_colors.dart';
 import '../../core/repositories/uniselection_repository.dart';
 import '../institutions/institution_detail_screen.dart';
 import '../comparison/comparison_screen.dart';
+import '../programmes/programme_detail_screen.dart';
 
 class ShortlistScreen extends StatefulWidget {
   final UniSelectionRepository repository;
-  final Function(int) onNavigateTab;
+  final Function(int)? onNavigateTab;
 
   const ShortlistScreen({
     super.key,
     required this.repository,
-    required this.onNavigateTab,
+    this.onNavigateTab,
   });
 
   @override
@@ -42,6 +43,33 @@ class _ShortlistScreenState extends State<ShortlistScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Saved Shortlist'),
+        actions: [
+          if (savedInstitutions.isNotEmpty || savedProgrammes.isNotEmpty) ...[
+            TextButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Clear Shortlist?'),
+                    content: const Text('Are you sure you want to remove all saved universities and programmes?'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                      TextButton(
+                        onPressed: () async {
+                          await widget.repository.clearShortlist();
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (mounted) setState(() {});
+                        },
+                        child: const Text('Clear All', style: TextStyle(color: AppColors.statusError)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: const Text('Clear All', style: TextStyle(color: AppColors.statusError, fontSize: 13)),
+            ),
+          ],
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.primary,
@@ -172,6 +200,20 @@ class _ShortlistScreenState extends State<ShortlistScreen>
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
+                        onTap: () {
+                          if (inst != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProgrammeDetailScreen(
+                                  programme: prog,
+                                  institution: inst,
+                                  repository: widget.repository,
+                                ),
+                              ),
+                            );
+                          }
+                        },
                         title: Text(
                           prog.name,
                           style: const TextStyle(
@@ -243,7 +285,7 @@ class _ShortlistScreenState extends State<ShortlistScreen>
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => widget.onNavigateTab(1),
+              onPressed: () => widget.onNavigateTab?.call(1),
               child: const Text('Browse Directory'),
             ),
           ],

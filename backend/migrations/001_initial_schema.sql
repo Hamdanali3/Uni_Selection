@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS institutions (
     city_id UUID REFERENCES cities(id),
     institution_type VARCHAR(30) NOT NULL CHECK (institution_type IN ('Public', 'Private', 'Autonomous')),
     hec_recognized BOOLEAN DEFAULT TRUE,
+    accreditation_body VARCHAR(150),
     official_website TEXT NOT NULL,
     admissions_url TEXT,
     contact_email VARCHAR(150),

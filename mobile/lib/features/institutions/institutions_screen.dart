@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/repositories/uniselection_repository.dart';
 import '../../core/models/institution.dart';
+import '../../core/models/programme.dart';
 import 'institution_detail_screen.dart';
+import '../programmes/programme_detail_screen.dart';
 
 class InstitutionsScreen extends StatefulWidget {
   final UniSelectionRepository repository;
@@ -18,15 +20,21 @@ class InstitutionsScreen extends StatefulWidget {
   State<InstitutionsScreen> createState() => _InstitutionsScreenState();
 }
 
-class _InstitutionsScreenState extends State<InstitutionsScreen> {
+class _InstitutionsScreenState extends State<InstitutionsScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+
   String? _selectedCategoryId;
   String? _selectedCityId;
   String? _selectedType;
+  String? _selectedDegreeLevel;
+  String? _selectedDisciplineId;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _selectedCategoryId = widget.initialCategoryId;
   }
 
@@ -36,11 +44,14 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
       _selectedCategoryId = null;
       _selectedCityId = null;
       _selectedType = null;
+      _selectedDegreeLevel = null;
+      _selectedDisciplineId = null;
     });
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -49,6 +60,7 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
   Widget build(BuildContext context) {
     final isNational = widget.repository.activeScope == 'national';
     final categories = widget.repository.categories;
+    final disciplines = widget.repository.disciplines;
     final cities = widget.repository.cities.where((c) {
       if (isNational) return c.countryId == 'PAK';
       return c.countryId != 'PAK';
@@ -61,18 +73,86 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
       query: _searchController.text,
     );
 
+    final programmes = widget.repository.searchProgrammes(
+      disciplineId: _selectedDisciplineId,
+      degreeLevel: _selectedDegreeLevel,
+      query: _searchController.text,
+    );
+
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 16,
         title: Text(isNational ? 'Pakistan Universities' : 'International Institutions'),
         actions: [
+          // National vs International Toggle Pill in AppBar
+          Container(
+            margin: const EdgeInsets.only(right: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildScopeChip('Pak', isNational, () {
+                  widget.repository.setScope('national');
+                  setState(() {
+                    _selectedCityId = null;
+                  });
+                }),
+                _buildScopeChip('Global', !isNational, () {
+                  widget.repository.setScope('international');
+                  setState(() {
+                    _selectedCityId = null;
+                  });
+                }),
+              ],
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.filter_alt_outlined),
-            onPressed: () => _showFilterBottomSheet(context, categories, cities),
+            tooltip: 'Filter Catalogue',
+            onPressed: () => _showFilterBottomSheet(context, categories, cities, disciplines),
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondary,
+          indicatorColor: AppColors.primary,
+          indicatorWeight: 3,
+          labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          tabs: [
+            Tab(text: 'Universities (${institutions.length})'),
+            Tab(text: 'Programmes (${programmes.length})'),
+          ],
+        ),
       ),
       body: Column(
         children: [
+          // International limited coverage banner (as required by test plan pass criteria)
+          if (!isNational) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: AppColors.secondaryContainer,
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: Color(0xFF0F766E)),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Curated Starter Catalogue: Showing accredited sample global universities. Comprehensive worldwide coverage is not claimed.',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF0F766E), height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Search Field
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -80,7 +160,9 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
               controller: _searchController,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                hintText: 'Search by university name, acronym, or city...',
+                hintText: _tabController.index == 0
+                    ? 'Search by university name, acronym, city, or discipline...'
+                    : 'Search by programme title or offering university...',
                 prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -97,7 +179,11 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
           ),
 
           // Active Filter Chips Row
-          if (_selectedCategoryId != null || _selectedCityId != null || _selectedType != null) ...[
+          if (_selectedCategoryId != null ||
+              _selectedCityId != null ||
+              _selectedType != null ||
+              _selectedDegreeLevel != null ||
+              _selectedDisciplineId != null) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: SizedBox(
@@ -135,6 +221,25 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
                       ),
                       const SizedBox(width: 8),
                     ],
+                    if (_selectedDegreeLevel != null) ...[
+                      Chip(
+                        label: Text(_selectedDegreeLevel!, style: const TextStyle(fontSize: 11)),
+                        deleteIcon: const Icon(Icons.close, size: 14),
+                        onDeleted: () => setState(() => _selectedDegreeLevel = null),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    if (_selectedDisciplineId != null) ...[
+                      Chip(
+                        label: Text(
+                          widget.repository.getDiscipline(_selectedDisciplineId!)?.name ?? 'Discipline',
+                          style: const TextStyle(fontSize: 11),
+                        ),
+                        deleteIcon: const Icon(Icons.close, size: 14),
+                        onDeleted: () => setState(() => _selectedDisciplineId = null),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                     TextButton(
                       onPressed: _resetFilters,
                       child: const Text('Reset All', style: TextStyle(fontSize: 12)),
@@ -145,51 +250,72 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
             ),
           ],
 
-          // Results Count Indicator
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-            child: Row(
+          // Tab Views
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                Text(
-                  '${institutions.length} institutions found',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const Spacer(),
-                if (isNational) ...[
-                  const Icon(Icons.shield_outlined, size: 14, color: AppColors.verifiedBadge),
-                  const SizedBox(width: 4),
-                  const Text(
-                    'HEC Recognized',
-                    style: TextStyle(fontSize: 11, color: AppColors.verifiedBadge, fontWeight: FontWeight.w600),
-                  ),
-                ],
+                // Tab 1: Universities
+                institutions.isEmpty
+                    ? _buildEmptyState('No Universities Match Filters', 'Try clearing your search query or removing category/city filters.')
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        itemCount: institutions.length,
+                        itemBuilder: (context, index) {
+                          final inst = institutions[index];
+                          return _buildInstitutionItem(context, inst);
+                        },
+                      ),
+
+                // Tab 2: Programmes Catalogue
+                programmes.isEmpty
+                    ? _buildEmptyState('No Programmes Match Filters', 'Try searching a different degree name or clearing degree filters.')
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        itemCount: programmes.length,
+                        itemBuilder: (context, index) {
+                          final prog = programmes[index];
+                          return _buildProgrammeItem(context, prog);
+                        },
+                      ),
               ],
             ),
-          ),
-
-          // Institution Cards List or Empty State
-          Expanded(
-            child: institutions.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: institutions.length,
-                    itemBuilder: (context, index) {
-                      final inst = institutions[index];
-                      return _buildInstitutionItem(context, inst);
-                    },
-                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildScopeChip(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(20),
+                    blurRadius: 4,
+                  )
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+            color: isSelected ? AppColors.primary : AppColors.textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String title, String message) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -205,15 +331,15 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
               child: const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No Institutions Match Filters',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Try clearing your search query or removing category/city filters.',
+            Text(
+              message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -228,6 +354,7 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
 
   Widget _buildInstitutionItem(BuildContext context, Institution inst) {
     final city = widget.repository.getCity(inst.cityId);
+    final country = widget.repository.getCountry(inst.countryId);
     final campuses = widget.repository.getCampusesForInstitution(inst.id);
     final programmes = widget.repository.getProgrammesForInstitution(inst.id);
     final isShortlisted = widget.repository.isInstitutionShortlisted(inst.id);
@@ -323,16 +450,21 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
                   const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
                   const SizedBox(width: 2),
                   Text(
-                    city?.name ?? inst.countryId,
+                    '${city?.name ?? ""}${city != null ? ", " : ""}${country?.name ?? inst.countryId}',
                     style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                   ),
                   const Spacer(),
-                  if (inst.hecRecognized) ...[
+                  if (inst.countryId == 'PAK' && inst.hecRecognized) ...[
                     const Icon(Icons.verified, color: AppColors.verifiedBadge, size: 15),
                     const SizedBox(width: 3),
                     const Text(
-                      'Verified',
+                      'HEC Recognized',
                       style: TextStyle(fontSize: 11, color: AppColors.verifiedBadge, fontWeight: FontWeight.w700),
+                    ),
+                  ] else if (inst.countryId != 'PAK') ...[
+                    Text(
+                      inst.accreditationBody != null ? inst.accreditationBody! : 'Accredited',
+                      style: const TextStyle(fontSize: 10.5, color: AppColors.secondary, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ],
@@ -364,7 +496,98 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
     );
   }
 
-  void _showFilterBottomSheet(BuildContext context, List categories, List cities) {
+  Widget _buildProgrammeItem(BuildContext context, Programme prog) {
+    final inst = widget.repository.getInstitutionById(prog.institutionId);
+    final discipline = widget.repository.getDiscipline(prog.disciplineId);
+    final rule = widget.repository.getEligibilityRuleForProgramme(prog.id);
+    final fee = widget.repository.getFeeRecordForProgramme(prog.id);
+    final isShortlisted = widget.repository.isProgrammeShortlisted(prog.id);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        onTap: () {
+          if (inst != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProgrammeDetailScreen(
+                  programme: prog,
+                  institution: inst,
+                  repository: widget.repository,
+                ),
+              ),
+            );
+          }
+        },
+        title: Text(
+          prog.name,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              inst?.name ?? '',
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.secondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    prog.degreeLevel,
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '${prog.durationYears.toStringAsFixed(0)} Years • ${discipline?.name ?? ""}',
+                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+            if (rule != null && rule.minPercentage != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Min Requirement: ${rule.minPercentage!.toStringAsFixed(0)}% aggregate',
+                style: const TextStyle(fontSize: 11.5, color: Color(0xFF0F766E), fontWeight: FontWeight.w600),
+              ),
+            ],
+            if (fee != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                'Tuition: ${fee.currency} ${fee.tuitionFee.toStringAsFixed(0)} (${fee.billingBasis})',
+                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              ),
+            ],
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            isShortlisted ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
+            color: isShortlisted ? AppColors.secondary : AppColors.textSecondary,
+          ),
+          onPressed: () {
+            widget.repository.toggleProgrammeShortlist(prog.id);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context, List categories, List cities, List disciplines) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -375,84 +598,147 @@ class _InstitutionsScreenState extends State<InstitutionsScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Filter Institutions',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          _resetFilters();
-                          Navigator.pop(ctx);
-                        },
-                        child: const Text('Reset'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'ACADEMIC CATEGORY',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 6,
-                    children: categories.map<Widget>((cat) {
-                      final isSelected = _selectedCategoryId == cat.id;
-                      return ChoiceChip(
-                        label: Text(cat.name, style: const TextStyle(fontSize: 12)),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setModalState(() {
-                            _selectedCategoryId = selected ? cat.id : null;
-                          });
-                          setState(() {});
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'SECTOR / GOVERNANCE',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: ['Public', 'Private', 'Autonomous'].map((type) {
-                      final isSelected = _selectedType == type;
-                      return ChoiceChip(
-                        label: Text(type, style: const TextStyle(fontSize: 12)),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setModalState(() {
-                            _selectedType = selected ? type : null;
-                          });
-                          setState(() {});
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Apply Filters'),
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.65,
+              maxChildSize: 0.9,
+              minChildSize: 0.4,
+              builder: (_, scrollController) {
+                return ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20.0),
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Filter Catalogue',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _resetFilters();
+                            Navigator.pop(ctx);
+                          },
+                          child: const Text('Reset All'),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
+                    const SizedBox(height: 12),
+
+                    // 1. Academic Category
+                    const Text(
+                      'ACADEMIC CATEGORY',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: categories.map<Widget>((cat) {
+                        final isSelected = _selectedCategoryId == cat.id;
+                        return ChoiceChip(
+                          label: Text(cat.name, style: const TextStyle(fontSize: 12)),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            setModalState(() {
+                              _selectedCategoryId = selected ? cat.id : null;
+                            });
+                            setState(() {});
+                          },
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 2. City / Geographic Region
+                    if (cities.isNotEmpty) ...[
+                      const Text(
+                        'LOCATION / CITY',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: cities.take(10).map<Widget>((city) {
+                          final isSelected = _selectedCityId == city.id;
+                          return ChoiceChip(
+                            label: Text(city.name, style: const TextStyle(fontSize: 12)),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              setModalState(() {
+                                _selectedCityId = selected ? city.id : null;
+                              });
+                              setState(() {});
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // 3. Degree Level
+                    const Text(
+                      'DEGREE LEVEL',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: ['Undergraduate', 'Postgraduate', 'Doctorate'].map((level) {
+                        final isSelected = _selectedDegreeLevel == level;
+                        return ChoiceChip(
+                          label: Text(level, style: const TextStyle(fontSize: 12)),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            setModalState(() {
+                              _selectedDegreeLevel = selected ? level : null;
+                            });
+                            setState(() {});
+                          },
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 4. Sector / Governance
+                    const Text(
+                      'SECTOR / GOVERNANCE',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: ['Public', 'Private', 'Autonomous'].map((type) {
+                        final isSelected = _selectedType == type;
+                        return ChoiceChip(
+                          label: Text(type, style: const TextStyle(fontSize: 12)),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            setModalState(() {
+                              _selectedType = selected ? type : null;
+                            });
+                            setState(() {});
+                          },
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Apply Filters'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              },
             );
           },
         );

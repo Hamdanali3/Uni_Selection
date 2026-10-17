@@ -32,7 +32,9 @@ class FeeRecord {
       academicSession: json['academic_session'] as String? ?? '2025-2026',
       currency: json['currency'] as String? ?? 'PKR',
       billingBasis: json['billing_basis'] as String? ?? 'Per Semester',
-      tuitionFee: (json['tuition_fee'] as num?)?.toDouble() ?? 0.0,
+      tuitionFee: (json['tuition_fee'] as num?)?.toDouble() ??
+          (json['tuition_amount'] as num?)?.toDouble() ??
+          0.0,
       admissionFeeOnetime:
           (json['admission_fee_onetime'] as num?)?.toDouble() ?? 0.0,
       securityDeposit: (json['security_deposit'] as num?)?.toDouble() ?? 0.0,

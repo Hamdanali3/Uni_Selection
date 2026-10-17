@@ -6,6 +6,7 @@ class Institution {
   final String? cityId;
   final String institutionType;
   final bool hecRecognized;
+  final String? accreditationBody;
   final String officialWebsite;
   final String? admissionsUrl;
   final String? contactEmail;
@@ -24,6 +25,7 @@ class Institution {
     this.cityId,
     required this.institutionType,
     required this.hecRecognized,
+    this.accreditationBody,
     required this.officialWebsite,
     this.admissionsUrl,
     this.contactEmail,
@@ -43,7 +45,9 @@ class Institution {
       countryId: json['country_id'] as String,
       cityId: json['city_id'] as String?,
       institutionType: json['institution_type'] as String? ?? 'Public',
-      hecRecognized: json['hec_recognized'] as bool? ?? true,
+      hecRecognized: json['hec_recognized'] as bool? ?? (json['country_id'] == 'PAK'),
+      accreditationBody: json['accreditation_body'] as String? ??
+          (json['country_id'] == 'PAK' ? 'Higher Education Commission (HEC) Pakistan' : null),
       officialWebsite: json['official_website'] as String,
       admissionsUrl: json['admissions_url'] as String?,
       contactEmail: json['contact_email'] as String?,
@@ -67,6 +71,7 @@ class Institution {
     'city_id': cityId,
     'institution_type': institutionType,
     'hec_recognized': hecRecognized,
+    'accreditation_body': accreditationBody,
     'official_website': officialWebsite,
     'admissions_url': admissionsUrl,
     'contact_email': contactEmail,

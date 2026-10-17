@@ -9,6 +9,8 @@ import json
 import os
 import sys
 import re
+import csv
+import hashlib
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -34,11 +36,18 @@ def is_valid_date(date_str: str) -> bool:
     except ValueError:
         return False
 
+def get_file_sha256(filepath: str) -> str:
+    h = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
 def validate_starter_dataset(file_path: str):
     print(f"[*] Validating starter dataset: {file_path}")
     if not os.path.exists(file_path):
         print(f"[!] Error: File does not exist at {file_path}")
-        return False
+        return False, []
 
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -98,6 +107,16 @@ def validate_starter_dataset(file_path: str):
             if cat not in category_ids:
                 errors.append(f"Institution '{inst_id}' references unknown category '{cat}'")
 
+        # Statutory accreditation integrity check
+        if inst.get("country_id") != "PAK":
+            if inst.get("hec_recognized") is True:
+                errors.append(f"International institution '{inst_id}' cannot be marked 'hec_recognized: True'.")
+            if not inst.get("accreditation_body"):
+                errors.append(f"International institution '{inst_id}' missing required 'accreditation_body'.")
+        else:
+            if inst.get("hec_recognized") is not True:
+                warnings.append(f"Pakistani institution '{inst_id}' is not marked HEC recognized.")
+
     # 5. Campuses
     for campus in data.get("campuses", []):
         cmp_id = campus.get("id")
@@ -154,7 +173,7 @@ def validate_starter_dataset(file_path: str):
         if not is_valid_url(fee.get("source_url", "")):
             errors.append(f"Fee record '{fee_id}' has invalid source_url: '{fee.get('source_url')}'")
 
-    # Print summary
+    # Summary
     print(f"[*] Total Institutions verified: {len(data.get('institutions', []))}")
     print(f"[*] Total Programmes verified: {len(data.get('programmes', []))}")
     print(f"[*] Total Eligibility Rules verified: {len(data.get('eligibility_rules', []))}")
@@ -167,16 +186,94 @@ def validate_starter_dataset(file_path: str):
             print(f"  - {w}")
 
     if errors:
-        print(f"\n[X] Validation FAILED with {len(errors)} Errors:")
+        print(f"\n[X] JSON Validation FAILED with {len(errors)} Errors:")
+        for e in errors:
+            print(f"  - {e}")
+        return False, data
+    else:
+        print("[V] JSON Dataset Validation PASSED with 0 errors!")
+        return True, data
+
+def validate_csv_templates(base_dir: str, json_data: dict):
+    print("\n[*] Validating CSV Import Templates in data/templates/...")
+    errors = []
+
+    # 1. Institutions template
+    inst_csv_path = os.path.join(base_dir, "templates", "institutions_template.csv")
+    if not os.path.exists(inst_csv_path):
+        errors.append(f"Institutions template not found: {inst_csv_path}")
+    else:
+        with open(inst_csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            required_cols = {"id", "name", "country_id", "institution_type", "hec_recognized", "official_website", "last_verified_at"}
+            missing_cols = required_cols - set(reader.fieldnames or [])
+            if missing_cols:
+                errors.append(f"institutions_template.csv missing columns: {missing_cols}")
+            for row_idx, row in enumerate(reader, start=2):
+                if not row.get("id"):
+                    errors.append(f"institutions_template.csv row {row_idx}: missing id")
+                if not is_valid_url(row.get("official_website", "")):
+                    errors.append(f"institutions_template.csv row {row_idx}: invalid official_website")
+                if row.get("country_id") != "PAK" and row.get("hec_recognized", "").strip().upper() == "TRUE":
+                    errors.append(f"institutions_template.csv row {row_idx}: non-PAK institution '{row.get('id')}' cannot have hec_recognized=TRUE")
+
+    # 2. Programmes template
+    prog_csv_path = os.path.join(base_dir, "templates", "programmes_template.csv")
+    if not os.path.exists(prog_csv_path):
+        errors.append(f"Programmes template not found: {prog_csv_path}")
+    else:
+        with open(prog_csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            required_cols = {"id", "institution_id", "name", "degree_level", "discipline_id", "duration_years", "official_url", "last_verified_at"}
+            missing_cols = required_cols - set(reader.fieldnames or [])
+            if missing_cols:
+                errors.append(f"programmes_template.csv missing columns: {missing_cols}")
+            for row_idx, row in enumerate(reader, start=2):
+                if not row.get("id"):
+                    errors.append(f"programmes_template.csv row {row_idx}: missing id")
+                if not is_valid_url(row.get("official_url", "")):
+                    errors.append(f"programmes_template.csv row {row_idx}: invalid official_url")
+
+    if errors:
+        print(f"[X] CSV Template Validation FAILED with {len(errors)} Errors:")
         for e in errors:
             print(f"  - {e}")
         return False
     else:
-        print("\n[V] Dataset Validation PASSED with 0 errors!")
+        print("[V] CSV Templates Validation PASSED with 0 errors!")
         return True
+
+def verify_dataset_synchronization(backend_json: str, mobile_json: str):
+    print("\n[*] Verifying Seed Data Synchronization (Backend <-> Mobile Asset)...")
+    if not os.path.exists(backend_json) or not os.path.exists(mobile_json):
+        print("[X] Missing backend or mobile dataset file.")
+        return False
+
+    hash_backend = get_file_sha256(backend_json)
+    hash_mobile = get_file_sha256(mobile_json)
+
+    if hash_backend == hash_mobile:
+        print(f"[V] Datasets match exactly! (SHA-256: {hash_backend[:12]}...)")
+        return True
+    else:
+        print(f"[X] Datasets differ! Backend: {hash_backend[:12]}, Mobile: {hash_mobile[:12]}")
+        return False
 
 if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    target_json = os.path.join(base_dir, "..", "backend", "seed", "starter_dataset.json")
-    success = validate_starter_dataset(target_json)
-    sys.exit(0 if success else 1)
+    target_backend_json = os.path.join(base_dir, "..", "backend", "seed", "starter_dataset.json")
+    target_mobile_json = os.path.join(base_dir, "..", "mobile", "assets", "data", "starter_dataset.json")
+
+    success_json, json_data = validate_starter_dataset(target_backend_json)
+    success_sync = verify_dataset_synchronization(target_backend_json, target_mobile_json)
+    success_csv = validate_csv_templates(base_dir, json_data if success_json else {})
+
+    all_passed = success_json and success_sync and success_csv
+    if all_passed:
+        print("\n==========================================")
+        print("ALL DATASET INTEGRITY CHECKS PASSED (100%)")
+        print("==========================================")
+        sys.exit(0)
+    else:
+        print("\n[!] Data validation failed.")
+        sys.exit(1)

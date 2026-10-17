@@ -148,7 +148,7 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
                         style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    if (inst.hecRecognized) ...[
+                    if (inst.countryId == 'PAK' && inst.hecRecognized) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
@@ -163,6 +163,31 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
                             Text(
                               'HEC Recognized',
                               style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF0F766E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (inst.countryId != 'PAK') ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondaryContainer,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.verified_user_outlined, size: 13, color: AppColors.secondary),
+                            const SizedBox(width: 4),
+                            Text(
+                              inst.accreditationBody != null
+                                  ? 'Accredited: ${inst.accreditationBody!}'
+                                  : 'Statutory Accreditation',
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF0F766E),

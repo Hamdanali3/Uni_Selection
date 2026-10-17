@@ -20,6 +20,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _preferredCity = 'c-isb';
 
   @override
+  void initState() {
+    super.initState();
+    final profile = widget.repository.userProfile;
+    if (profile.isNotEmpty) {
+      if (profile['intended_degree_level'] is String) {
+        _degreeLevel = profile['intended_degree_level'] as String;
+      }
+      if (profile['preferred_disciplines'] is List) {
+        _selectedDisciplines.clear();
+        _selectedDisciplines.addAll(
+          (profile['preferred_disciplines'] as List).map((e) => e.toString()),
+        );
+      }
+      if (profile['preferred_city'] is String) {
+        _preferredCity = profile['preferred_city'] as String;
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cities = widget.repository.cities.where((c) => c.countryId == 'PAK').toList();
     final disciplines = widget.repository.disciplines;
@@ -178,10 +198,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 24),
 
           ElevatedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Preferences saved successfully on your device.')),
-              );
+            onPressed: () async {
+              final profile = {
+                'intended_degree_level': _degreeLevel,
+                'preferred_disciplines': _selectedDisciplines.toList(),
+                'preferred_city': _preferredCity,
+                'updated_at': DateTime.now().toIso8601String(),
+              };
+              await widget.repository.saveProfile(profile);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Preferences saved successfully on your device.')),
+                );
+              }
             },
             child: const Text('Save Preferences'),
           ),

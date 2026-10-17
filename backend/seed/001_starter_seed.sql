@@ -45,14 +45,14 @@ INSERT INTO disciplines (id, category_id, name) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 5. Institutions (Key Starters)
-INSERT INTO institutions (id, name, short_name, country_id, city_id, institution_type, hec_recognized, official_website, admissions_url, status, last_verified_at) VALUES
-('nust', 'National University of Sciences & Technology', 'NUST', 'PAK', 'b1010000-0000-0000-0000-000000000001', 'Public', true, 'https://nust.edu.pk', 'https://ugadmissions.nust.edu.pk', 'published', '2026-09-20'),
-('lums', 'Lahore University of Management Sciences', 'LUMS', 'PAK', 'b1010000-0000-0000-0000-000000000002', 'Private', true, 'https://lums.edu.pk', 'https://admissions.lums.edu.pk', 'published', '2026-09-18'),
-('giki', 'Ghulam Ishaq Khan Institute of Engineering Sciences and Technology', 'GIKI', 'PAK', 'b1010000-0000-0000-0000-000000000004', 'Autonomous', true, 'https://giki.edu.pk', 'https://giki.edu.pk/admissions', 'published', '2026-09-15'),
-('fast-nu', 'National University of Computer and Emerging Sciences', 'FAST-NUCES', 'PAK', 'b1010000-0000-0000-0000-000000000001', 'Private', true, 'https://nu.edu.pk', 'https://admissions.nu.edu.pk', 'published', '2026-09-22'),
-('aku', 'Aga Khan University', 'AKU', 'PAK', 'b1010000-0000-0000-0000-000000000003', 'Private', true, 'https://aku.edu', 'https://www.aku.edu/admissions', 'published', '2026-09-12'),
-('oxford', 'University of Oxford', 'Oxford', 'GBR', 'b1010000-0000-0000-0000-000000000005', 'Public', true, 'https://ox.ac.uk', 'https://www.ox.ac.uk/admissions', 'published', '2026-09-01'),
-('mit', 'Massachusetts Institute of Technology', 'MIT', 'USA', 'b1010000-0000-0000-0000-000000000006', 'Private', true, 'https://mit.edu', 'https://mitadmissions.org', 'published', '2026-09-08')
+INSERT INTO institutions (id, name, short_name, country_id, city_id, institution_type, hec_recognized, accreditation_body, official_website, admissions_url, status, last_verified_at) VALUES
+('nust', 'National University of Sciences & Technology', 'NUST', 'PAK', 'b1010000-0000-0000-0000-000000000001', 'Public', true, 'Higher Education Commission (HEC) Pakistan', 'https://nust.edu.pk', 'https://ugadmissions.nust.edu.pk', 'published', '2026-09-20'),
+('lums', 'Lahore University of Management Sciences', 'LUMS', 'PAK', 'b1010000-0000-0000-0000-000000000002', 'Private', true, 'Higher Education Commission (HEC) Pakistan', 'https://lums.edu.pk', 'https://admissions.lums.edu.pk', 'published', '2026-09-18'),
+('giki', 'Ghulam Ishaq Khan Institute of Engineering Sciences and Technology', 'GIKI', 'PAK', 'b1010000-0000-0000-0000-000000000004', 'Autonomous', true, 'Higher Education Commission (HEC) Pakistan', 'https://giki.edu.pk', 'https://giki.edu.pk/admissions', 'published', '2026-09-15'),
+('fast-nu', 'National University of Computer and Emerging Sciences', 'FAST-NUCES', 'PAK', 'b1010000-0000-0000-0000-000000000001', 'Private', true, 'Higher Education Commission (HEC) Pakistan', 'https://nu.edu.pk', 'https://admissions.nu.edu.pk', 'published', '2026-09-22'),
+('aku', 'Aga Khan University', 'AKU', 'PAK', 'b1010000-0000-0000-0000-000000000003', 'Private', true, 'Higher Education Commission (HEC) Pakistan', 'https://aku.edu', 'https://www.aku.edu/admissions', 'published', '2026-09-12'),
+('oxford', 'University of Oxford', 'Oxford', 'GBR', 'b1010000-0000-0000-0000-000000000005', 'Public', false, 'Office for Students (OfS)', 'https://ox.ac.uk', 'https://www.ox.ac.uk/admissions', 'published', '2026-09-01'),
+('mit', 'Massachusetts Institute of Technology', 'MIT', 'USA', 'b1010000-0000-0000-0000-000000000006', 'Private', false, 'NECHE (USA)', 'https://mit.edu', 'https://mitadmissions.org', 'published', '2026-09-08')
 ON CONFLICT (id) DO NOTHING;
 
 -- 6. Institution Categories Junction

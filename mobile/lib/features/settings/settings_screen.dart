@@ -22,6 +22,15 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final backendStatusText = repository.remoteApi.isConfigured
+        ? (repository.backendStatus == BackendSyncStatus.connected
+            ? 'Supabase REST Connected'
+            : 'Connecting / Syncing...')
+        : 'Offline Starter Dataset (Active)';
+
+    final isOffline = !repository.remoteApi.isConfigured ||
+        repository.backendStatus == BackendSyncStatus.offlineFallback;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings & About'),
@@ -63,6 +72,56 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // System Diagnostics & Backend Connectivity
+          const Text(
+            'System Diagnostics & Data Sync',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          Material(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: const BorderSide(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(
+                    isOffline ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
+                    color: isOffline ? AppColors.secondary : AppColors.verifiedBadge,
+                  ),
+                  title: const Text('Backend Data Channel', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  subtitle: Text(backendStatusText, style: const TextStyle(fontSize: 12)),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: (isOffline ? Colors.amber : Colors.green).withAlpha(30),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      isOffline ? 'OFFLINE SEED' : 'LIVE API',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: isOffline ? Colors.orange.shade900 : Colors.green.shade800,
+                      ),
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.storage_rounded, color: AppColors.tertiary),
+                  title: const Text('Local Starter Dataset', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  subtitle: const Text('39 institutions • 14 programmes • 100% cited', style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.check_circle, color: AppColors.verifiedBadge, size: 18),
                 ),
               ],
             ),
@@ -114,6 +173,23 @@ class SettingsScreen extends StatelessWidget {
                       repository.setScope(isNat ? 'national' : 'international');
                     },
                   ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.restart_alt_rounded, color: AppColors.statusError),
+                  title: const Text('Reset Onboarding Walkthrough', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Allows re-experiencing the National vs Global welcome screen', style: TextStyle(fontSize: 12)),
+                  onTap: () async {
+                    await repository.resetOnboarding();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Onboarding reset. Relaunch the app to view the welcome flow.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),

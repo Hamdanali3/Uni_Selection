@@ -6,11 +6,13 @@ class LocalStorageService {
   static const _keyShortlistProgrammes = 'shortlist_programmes';
   static const _keySelectedScope = 'selected_scope';
   static const _keyUserProfile = 'user_profile';
+  static const _keyCompletedOnboarding = 'has_completed_onboarding';
 
   final Set<String> _inMemoryInstitutions = {};
   final Set<String> _inMemoryProgrammes = {};
   String _inMemoryScope = 'national';
   Map<String, dynamic> _inMemoryProfile = {};
+  bool _inMemoryCompletedOnboarding = false;
 
   SharedPreferences? _prefs;
 
@@ -24,6 +26,7 @@ class LocalStorageService {
         _prefs?.getStringList(_keyShortlistProgrammes) ?? [],
       );
       _inMemoryScope = _prefs?.getString(_keySelectedScope) ?? 'national';
+      _inMemoryCompletedOnboarding = _prefs?.getBool(_keyCompletedOnboarding) ?? false;
       final profileStr = _prefs?.getString(_keyUserProfile);
       if (profileStr != null && profileStr.isNotEmpty) {
         _inMemoryProfile = jsonDecode(profileStr) as Map<String, dynamic>;
@@ -37,11 +40,29 @@ class LocalStorageService {
   Set<String> get shortlistedProgrammeIds => Set.unmodifiable(_inMemoryProgrammes);
   String get selectedScope => _inMemoryScope;
   Map<String, dynamic> get userProfile => Map.unmodifiable(_inMemoryProfile);
+  Map<String, dynamic>? get savedProfile => _inMemoryProfile.isEmpty ? null : Map.unmodifiable(_inMemoryProfile);
+  bool get hasCompletedOnboarding => _inMemoryCompletedOnboarding;
+
+  Future<void> setCompletedOnboarding(bool value) async {
+    _inMemoryCompletedOnboarding = value;
+    try {
+      await _prefs?.setBool(_keyCompletedOnboarding, value);
+    } catch (_) {}
+  }
 
   Future<void> setScope(String scope) async {
     _inMemoryScope = scope;
     try {
       await _prefs?.setString(_keySelectedScope, scope);
+    } catch (_) {}
+  }
+
+  Future<void> clearShortlist() async {
+    _inMemoryInstitutions.clear();
+    _inMemoryProgrammes.clear();
+    try {
+      await _prefs?.remove(_keyShortlistInstitutions);
+      await _prefs?.remove(_keyShortlistProgrammes);
     } catch (_) {}
   }
 

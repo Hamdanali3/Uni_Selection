@@ -97,20 +97,28 @@ class ComparisonScreen extends StatelessWidget {
                       )),
                 ]),
 
-                // 4. HEC Accreditation
+                // 4. Accreditation Status
                 DataRow(cells: [
-                  const DataCell(Text('HEC Recognized', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
+                  const DataCell(Text('Accreditation', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
                   ...institutions.map((inst) => DataCell(
-                        inst.hecRecognized
-                            ? const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.check_circle, color: AppColors.verifiedBadge, size: 16),
-                                  SizedBox(width: 4),
-                                  Text('Verified', style: TextStyle(color: AppColors.verifiedBadge, fontSize: 12, fontWeight: FontWeight.w600)),
-                                ],
-                              )
-                            : const Text('Not listed', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        inst.countryId == 'PAK'
+                            ? (inst.hecRecognized
+                                ? const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.check_circle, color: AppColors.verifiedBadge, size: 16),
+                                      SizedBox(width: 4),
+                                      Text('HEC Recognized', style: TextStyle(color: AppColors.verifiedBadge, fontSize: 11, fontWeight: FontWeight.w600)),
+                                    ],
+                                  )
+                                : const Text('Not listed', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)))
+                            : SizedBox(
+                                width: 140,
+                                child: Text(
+                                  inst.accreditationBody ?? 'Statutory Accreditation',
+                                  style: const TextStyle(fontSize: 11, color: AppColors.secondary, fontWeight: FontWeight.w600),
+                                ),
+                              ),
                       )),
                 ]),
 
@@ -138,7 +146,7 @@ class ComparisonScreen extends StatelessWidget {
 
                 // 7. Sample Tuition Basis
                 DataRow(cells: [
-                  const DataCell(Text('Sample Fee Basis', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
+                  const DataCell(Text('Tuition Fee Basis', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12))),
                   ...institutions.map((inst) {
                     final progs = repository.getProgrammesForInstitution(inst.id);
                     FeeRecord? sampleFee;
@@ -151,9 +159,22 @@ class ComparisonScreen extends StatelessWidget {
                     }
                     if (sampleFee != null) {
                       return DataCell(
-                        Text(
-                          '${sampleFee.currency} ${sampleFee.tuitionFee.toStringAsFixed(0)} (${sampleFee.billingBasis})',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${sampleFee.currency} ${sampleFee.tuitionFee.toStringAsFixed(0)}',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                              ),
+                              Text(
+                                '${sampleFee.billingBasis} • ${sampleFee.academicSession}',
+                                style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }

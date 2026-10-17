@@ -62,6 +62,8 @@ class EligibilityRule {
     'last_verified_at': lastVerifiedAt,
   };
 
+  bool get hasEntryTest => acceptedEntryTests != null && acceptedEntryTests!.isNotEmpty;
+
   /// Evaluates student score against this published rule
   EligibilityResult evaluate(double studentPercentage) {
     if (minPercentage == null) {

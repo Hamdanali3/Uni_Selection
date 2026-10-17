@@ -1,60 +1,289 @@
 {
   "countries": [
-    { "id": "PAK", "name": "Pakistan", "is_national": true },
-    { "id": "GBR", "name": "United Kingdom", "is_national": false },
-    { "id": "USA", "name": "United States", "is_national": false },
-    { "id": "CAN", "name": "Canada", "is_national": false },
-    { "id": "DEU", "name": "Germany", "is_national": false },
-    { "id": "AUS", "name": "Australia", "is_national": false },
-    { "id": "SGP", "name": "Singapore", "is_national": false },
-    { "id": "TUR", "name": "Turkey", "is_national": false },
-    { "id": "MYS", "name": "Malaysia", "is_national": false }
+    {
+      "id": "PAK",
+      "name": "Pakistan",
+      "is_national": true
+    },
+    {
+      "id": "GBR",
+      "name": "United Kingdom",
+      "is_national": false
+    },
+    {
+      "id": "USA",
+      "name": "United States",
+      "is_national": false
+    },
+    {
+      "id": "CAN",
+      "name": "Canada",
+      "is_national": false
+    },
+    {
+      "id": "DEU",
+      "name": "Germany",
+      "is_national": false
+    },
+    {
+      "id": "AUS",
+      "name": "Australia",
+      "is_national": false
+    },
+    {
+      "id": "SGP",
+      "name": "Singapore",
+      "is_national": false
+    },
+    {
+      "id": "TUR",
+      "name": "Turkey",
+      "is_national": false
+    },
+    {
+      "id": "MYS",
+      "name": "Malaysia",
+      "is_national": false
+    }
   ],
   "cities": [
-    { "id": "c-isb", "country_id": "PAK", "name": "Islamabad", "province_state": "Islamabad Capital Territory" },
-    { "id": "c-lhr", "country_id": "PAK", "name": "Lahore", "province_state": "Punjab" },
-    { "id": "c-khi", "country_id": "PAK", "name": "Karachi", "province_state": "Sindh" },
-    { "id": "c-pes", "country_id": "PAK", "name": "Peshawar", "province_state": "Khyber Pakhtunkhwa" },
-    { "id": "c-topi", "country_id": "PAK", "name": "Topi, Swabi", "province_state": "Khyber Pakhtunkhwa" },
-    { "id": "c-abt", "country_id": "PAK", "name": "Abbottabad", "province_state": "Khyber Pakhtunkhwa" },
-    { "id": "c-oxf", "country_id": "GBR", "name": "Oxford", "province_state": "England" },
-    { "id": "c-cam", "country_id": "GBR", "name": "Cambridge", "province_state": "England" },
-    { "id": "c-lon", "country_id": "GBR", "name": "London", "province_state": "England" },
-    { "id": "c-bos", "country_id": "USA", "name": "Cambridge / Boston", "province_state": "Massachusetts" },
-    { "id": "c-sta", "country_id": "USA", "name": "Stanford", "province_state": "California" },
-    { "id": "c-tor", "country_id": "CAN", "name": "Toronto", "province_state": "Ontario" },
-    { "id": "c-mon", "country_id": "CAN", "name": "Montreal", "province_state": "Quebec" },
-    { "id": "c-mun", "country_id": "DEU", "name": "Munich", "province_state": "Bavaria" },
-    { "id": "c-hei", "country_id": "DEU", "name": "Heidelberg", "province_state": "Baden-Württemberg" },
-    { "id": "c-mel", "country_id": "AUS", "name": "Melbourne", "province_state": "Victoria" },
-    { "id": "c-sgp", "country_id": "SGP", "name": "Singapore", "province_state": "Singapore" },
-    { "id": "c-ank", "country_id": "TUR", "name": "Ankara", "province_state": "Central Anatolia" },
-    { "id": "c-kul", "country_id": "MYS", "name": "Kuala Lumpur", "province_state": "Federal Territory" }
+    {
+      "id": "c-isb",
+      "country_id": "PAK",
+      "name": "Islamabad",
+      "province_state": "Islamabad Capital Territory"
+    },
+    {
+      "id": "c-lhr",
+      "country_id": "PAK",
+      "name": "Lahore",
+      "province_state": "Punjab"
+    },
+    {
+      "id": "c-khi",
+      "country_id": "PAK",
+      "name": "Karachi",
+      "province_state": "Sindh"
+    },
+    {
+      "id": "c-pes",
+      "country_id": "PAK",
+      "name": "Peshawar",
+      "province_state": "Khyber Pakhtunkhwa"
+    },
+    {
+      "id": "c-topi",
+      "country_id": "PAK",
+      "name": "Topi, Swabi",
+      "province_state": "Khyber Pakhtunkhwa"
+    },
+    {
+      "id": "c-abt",
+      "country_id": "PAK",
+      "name": "Abbottabad",
+      "province_state": "Khyber Pakhtunkhwa"
+    },
+    {
+      "id": "c-oxf",
+      "country_id": "GBR",
+      "name": "Oxford",
+      "province_state": "England"
+    },
+    {
+      "id": "c-cam",
+      "country_id": "GBR",
+      "name": "Cambridge",
+      "province_state": "England"
+    },
+    {
+      "id": "c-lon",
+      "country_id": "GBR",
+      "name": "London",
+      "province_state": "England"
+    },
+    {
+      "id": "c-bos",
+      "country_id": "USA",
+      "name": "Cambridge / Boston",
+      "province_state": "Massachusetts"
+    },
+    {
+      "id": "c-sta",
+      "country_id": "USA",
+      "name": "Stanford",
+      "province_state": "California"
+    },
+    {
+      "id": "c-tor",
+      "country_id": "CAN",
+      "name": "Toronto",
+      "province_state": "Ontario"
+    },
+    {
+      "id": "c-mon",
+      "country_id": "CAN",
+      "name": "Montreal",
+      "province_state": "Quebec"
+    },
+    {
+      "id": "c-mun",
+      "country_id": "DEU",
+      "name": "Munich",
+      "province_state": "Bavaria"
+    },
+    {
+      "id": "c-hei",
+      "country_id": "DEU",
+      "name": "Heidelberg",
+      "province_state": "Baden-Württemberg"
+    },
+    {
+      "id": "c-mel",
+      "country_id": "AUS",
+      "name": "Melbourne",
+      "province_state": "Victoria"
+    },
+    {
+      "id": "c-sgp",
+      "country_id": "SGP",
+      "name": "Singapore",
+      "province_state": "Singapore"
+    },
+    {
+      "id": "c-ank",
+      "country_id": "TUR",
+      "name": "Ankara",
+      "province_state": "Central Anatolia"
+    },
+    {
+      "id": "c-kul",
+      "country_id": "MYS",
+      "name": "Kuala Lumpur",
+      "province_state": "Federal Territory"
+    }
   ],
   "categories": [
-    { "id": "cat-eng", "slug": "engineering", "name": "Engineering & Technology", "icon_name": "engineering", "description": "Accredited engineering disciplines including electrical, mechanical, civil, chemical, and mechatronics." },
-    { "id": "cat-cs", "slug": "computing-it", "name": "Computing & Artificial Intelligence", "icon_name": "computer", "description": "Computer science, software engineering, AI, cyber security, and data science." },
-    { "id": "cat-med", "slug": "medical-health", "name": "Medical & Health Sciences", "icon_name": "local_hospital", "description": "MBBS, BDS, pharmacy, allied health sciences, and biomedical fields." },
-    { "id": "cat-biz", "slug": "business-management", "name": "Business & Management", "icon_name": "business_center", "description": "Business administration, accounting, finance, marketing, and economics." },
-    { "id": "cat-sci", "slug": "natural-sciences", "name": "Natural & Applied Sciences", "icon_name": "science", "description": "Physics, chemistry, mathematics, biotechnology, and environmental sciences." },
-    { "id": "cat-soc", "slug": "social-humanities", "name": "Social Sciences & Humanities", "icon_name": "menu_book", "description": "Law, international relations, psychology, literature, and media studies." },
-    { "id": "cat-art", "slug": "arts-architecture", "name": "Architecture, Art & Design", "icon_name": "palette", "description": "Architecture, visual arts, textile design, and film/theatre studies." }
+    {
+      "id": "cat-eng",
+      "slug": "engineering",
+      "name": "Engineering & Technology",
+      "icon_name": "engineering",
+      "description": "Accredited engineering disciplines including electrical, mechanical, civil, chemical, and mechatronics."
+    },
+    {
+      "id": "cat-cs",
+      "slug": "computing-it",
+      "name": "Computing & Artificial Intelligence",
+      "icon_name": "computer",
+      "description": "Computer science, software engineering, AI, cyber security, and data science."
+    },
+    {
+      "id": "cat-med",
+      "slug": "medical-health",
+      "name": "Medical & Health Sciences",
+      "icon_name": "local_hospital",
+      "description": "MBBS, BDS, pharmacy, allied health sciences, and biomedical fields."
+    },
+    {
+      "id": "cat-biz",
+      "slug": "business-management",
+      "name": "Business & Management",
+      "icon_name": "business_center",
+      "description": "Business administration, accounting, finance, marketing, and economics."
+    },
+    {
+      "id": "cat-sci",
+      "slug": "natural-sciences",
+      "name": "Natural & Applied Sciences",
+      "icon_name": "science",
+      "description": "Physics, chemistry, mathematics, biotechnology, and environmental sciences."
+    },
+    {
+      "id": "cat-soc",
+      "slug": "social-humanities",
+      "name": "Social Sciences & Humanities",
+      "icon_name": "menu_book",
+      "description": "Law, international relations, psychology, literature, and media studies."
+    },
+    {
+      "id": "cat-art",
+      "slug": "arts-architecture",
+      "name": "Architecture, Art & Design",
+      "icon_name": "palette",
+      "description": "Architecture, visual arts, textile design, and film/theatre studies."
+    }
   ],
   "disciplines": [
-    { "id": "disc-cs", "category_id": "cat-cs", "name": "Computer Science" },
-    { "id": "disc-se", "category_id": "cat-cs", "name": "Software Engineering" },
-    { "id": "disc-ai", "category_id": "cat-cs", "name": "Artificial Intelligence" },
-    { "id": "disc-ee", "category_id": "cat-eng", "name": "Electrical Engineering" },
-    { "id": "disc-me", "category_id": "cat-eng", "name": "Mechanical Engineering" },
-    { "id": "disc-ce", "category_id": "cat-eng", "name": "Civil Engineering" },
-    { "id": "disc-mbbs", "category_id": "cat-med", "name": "Medicine (MBBS)" },
-    { "id": "disc-bds", "category_id": "cat-med", "name": "Dentistry (BDS)" },
-    { "id": "disc-bba", "category_id": "cat-biz", "name": "Business Administration (BBA)" },
-    { "id": "disc-acc", "category_id": "cat-biz", "name": "Accounting & Finance" },
-    { "id": "disc-eco", "category_id": "cat-soc", "name": "Economics" },
-    { "id": "disc-law", "category_id": "cat-soc", "name": "Law (LL.B)" },
-    { "id": "disc-arch", "category_id": "cat-art", "name": "Architecture (B.Arch)" },
-    { "id": "disc-bio", "category_id": "cat-sci", "name": "Biotechnology" }
+    {
+      "id": "disc-cs",
+      "category_id": "cat-cs",
+      "name": "Computer Science"
+    },
+    {
+      "id": "disc-se",
+      "category_id": "cat-cs",
+      "name": "Software Engineering"
+    },
+    {
+      "id": "disc-ai",
+      "category_id": "cat-cs",
+      "name": "Artificial Intelligence"
+    },
+    {
+      "id": "disc-ee",
+      "category_id": "cat-eng",
+      "name": "Electrical Engineering"
+    },
+    {
+      "id": "disc-me",
+      "category_id": "cat-eng",
+      "name": "Mechanical Engineering"
+    },
+    {
+      "id": "disc-ce",
+      "category_id": "cat-eng",
+      "name": "Civil Engineering"
+    },
+    {
+      "id": "disc-mbbs",
+      "category_id": "cat-med",
+      "name": "Medicine (MBBS)"
+    },
+    {
+      "id": "disc-bds",
+      "category_id": "cat-med",
+      "name": "Dentistry (BDS)"
+    },
+    {
+      "id": "disc-bba",
+      "category_id": "cat-biz",
+      "name": "Business Administration (BBA)"
+    },
+    {
+      "id": "disc-acc",
+      "category_id": "cat-biz",
+      "name": "Accounting & Finance"
+    },
+    {
+      "id": "disc-eco",
+      "category_id": "cat-soc",
+      "name": "Economics"
+    },
+    {
+      "id": "disc-law",
+      "category_id": "cat-soc",
+      "name": "Law (LL.B)"
+    },
+    {
+      "id": "disc-arch",
+      "category_id": "cat-art",
+      "name": "Architecture (B.Arch)"
+    },
+    {
+      "id": "disc-bio",
+      "category_id": "cat-sci",
+      "name": "Biotechnology"
+    }
   ],
   "institutions": [
     {
@@ -70,9 +299,16 @@
       "contact_email": "admissions@nust.edu.pk",
       "contact_phone": "+92-51-90856878",
       "overview": "Premier public research university established in 1991, known for STEM excellence, world-class labs, and innovation park.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-biz", "cat-sci", "cat-soc"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-biz",
+        "cat-sci",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-20",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "lums",
@@ -87,9 +323,16 @@
       "contact_email": "admissions@lums.edu.pk",
       "contact_phone": "+92-42-35608000",
       "overview": "Leading private research university founded in 1985, renowned for business management, computer science, economics, and humanities.",
-      "category_ids": ["cat-biz", "cat-cs", "cat-eng", "cat-soc", "cat-sci"],
+      "category_ids": [
+        "cat-biz",
+        "cat-cs",
+        "cat-eng",
+        "cat-soc",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-18",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "giki",
@@ -104,9 +347,14 @@
       "contact_email": "admissions@giki.edu.pk",
       "contact_phone": "+92-938-271858",
       "overview": "Residential engineering institute situated in Topi, renowned for high academic rigor in engineering, computing, and material sciences.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-sci"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-15",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "fast-nu",
@@ -121,9 +369,14 @@
       "contact_email": "admissions@nu.edu.pk",
       "contact_phone": "+92-51-111-128-128",
       "overview": "Pioneer in computing education in Pakistan, with campus networks across Islamabad, Lahore, Karachi, Peshawar, and Chiniot.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz"
+      ],
       "last_verified_at": "2026-09-22",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "qau",
@@ -138,9 +391,14 @@
       "contact_email": "admissions@qau.edu.pk",
       "contact_phone": "+92-51-90642020",
       "overview": "Top-ranked federal research institution recognized nationally for natural sciences, social sciences, and biological research.",
-      "category_ids": ["cat-sci", "cat-soc", "cat-cs"],
+      "category_ids": [
+        "cat-sci",
+        "cat-soc",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-10",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "aku",
@@ -155,9 +413,13 @@
       "contact_email": "admissions.query@aku.edu",
       "contact_phone": "+92-21-34864410",
       "overview": "Internationally accredited university focused on health sciences, medical research, nursing, and teacher development.",
-      "category_ids": ["cat-med", "cat-sci"],
+      "category_ids": [
+        "cat-med",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-12",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "comsats",
@@ -172,9 +434,16 @@
       "contact_email": "admissions@comsats.edu.pk",
       "contact_phone": "+92-51-9247000",
       "overview": "Multi-campus public university providing degrees in IT, engineering, business, and architecture across 7 campuses.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz", "cat-art", "cat-sci"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz",
+        "cat-art",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-25",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "uet-lahore",
@@ -189,9 +458,14 @@
       "contact_email": "admission@uet.edu.pk",
       "contact_phone": "+92-42-99029216",
       "overview": "Oldest engineering university in Pakistan founded in 1921, conducting research across mechanical, electrical, civil, and chemical engineering.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-art"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-20",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "iba-karachi",
@@ -206,9 +480,14 @@
       "contact_email": "admission@iba.edu.pk",
       "contact_phone": "+92-21-38104700",
       "overview": "Oldest business school outside North America, established in 1955 with Wharton School collaboration.",
-      "category_ids": ["cat-biz", "cat-cs", "cat-soc"],
+      "category_ids": [
+        "cat-biz",
+        "cat-cs",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-19",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "pieas",
@@ -223,9 +502,14 @@
       "contact_email": "admissions@pieas.edu.pk",
       "contact_phone": "+92-51-9248740",
       "overview": "Selective public research university specialized in nuclear engineering, robotics, IT, and medical physics.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-sci"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-17",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "pu",
@@ -240,9 +524,16 @@
       "contact_email": "info@pu.edu.pk",
       "contact_phone": "+92-42-99231102",
       "overview": "Established in 1882, the largest public university in Pakistan offering comprehensive faculties in arts, sciences, law, and commerce.",
-      "category_ids": ["cat-soc", "cat-sci", "cat-biz", "cat-cs", "cat-art"],
+      "category_ids": [
+        "cat-soc",
+        "cat-sci",
+        "cat-biz",
+        "cat-cs",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-20",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "uok",
@@ -257,9 +548,16 @@
       "contact_email": "info@uok.edu.pk",
       "contact_phone": "+92-21-99261300",
       "overview": "Major public university in Karachi with 53 departments and 19 research institutes spanning natural and social sciences.",
-      "category_ids": ["cat-sci", "cat-soc", "cat-biz", "cat-cs", "cat-med"],
+      "category_ids": [
+        "cat-sci",
+        "cat-soc",
+        "cat-biz",
+        "cat-cs",
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-14",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "ned",
@@ -274,9 +572,14 @@
       "contact_email": "admissions@neduet.edu.pk",
       "contact_phone": "+92-21-99261261",
       "overview": "Historic engineering university serving southern Pakistan with comprehensive engineering and technology disciplines.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-art"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-18",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "kemu",
@@ -291,9 +594,12 @@
       "contact_email": "info@kemu.edu.pk",
       "contact_phone": "+92-42-37354005",
       "overview": "Founded in 1860, Pakistan's most storied medical university affiliated with Mayo Hospital Lahore.",
-      "category_ids": ["cat-med"],
+      "category_ids": [
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-21",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "dow",
@@ -308,9 +614,12 @@
       "contact_email": "admissions@duhs.edu.pk",
       "contact_phone": "+92-21-99215754",
       "overview": "Renowned public health and medical university located in Karachi with specialized institutes of cardiology and dental care.",
-      "category_ids": ["cat-med"],
+      "category_ids": [
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-18",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "habib",
@@ -325,9 +634,15 @@
       "contact_email": "admissions@habib.edu.pk",
       "contact_phone": "+92-21-111-042-242",
       "overview": "Liberal arts and sciences institution focused on critical inquiry, design, and interdisciplinary engineering.",
-      "category_ids": ["cat-soc", "cat-cs", "cat-eng", "cat-art"],
+      "category_ids": [
+        "cat-soc",
+        "cat-cs",
+        "cat-eng",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-20",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "bnu",
@@ -342,9 +657,15 @@
       "contact_email": "info@bnu.edu.pk",
       "contact_phone": "+92-42-38100156",
       "overview": "First liberal arts university in Lahore known for visual arts, architecture, media, and theatre design.",
-      "category_ids": ["cat-art", "cat-soc", "cat-biz", "cat-cs"],
+      "category_ids": [
+        "cat-art",
+        "cat-soc",
+        "cat-biz",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-16",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "kinnaird",
@@ -359,9 +680,15 @@
       "contact_email": "admissions@kinnaird.edu.pk",
       "contact_phone": "+92-42-99203781",
       "overview": "Historic women's college founded in 1913, offering undergraduate and graduate degrees in arts, sciences, and media.",
-      "category_ids": ["cat-soc", "cat-sci", "cat-biz", "cat-art"],
+      "category_ids": [
+        "cat-soc",
+        "cat-sci",
+        "cat-biz",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-12",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "fccollege",
@@ -376,9 +703,15 @@
       "contact_email": "admissions@fccollege.edu.pk",
       "contact_phone": "+92-42-99231581",
       "overview": "Established in 1864, FCCU offers an American-style four-year baccalaureate honors degree across sciences and humanities.",
-      "category_ids": ["cat-soc", "cat-biz", "cat-sci", "cat-cs"],
+      "category_ids": [
+        "cat-soc",
+        "cat-biz",
+        "cat-sci",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-15",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "cust",
@@ -393,9 +726,15 @@
       "contact_email": "admissions@cust.edu.pk",
       "contact_phone": "+92-51-111-555-666",
       "overview": "Private university in Islamabad recognized for computing, engineering, management sciences, and pharmacy.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz", "cat-med"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz",
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-22",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "air",
@@ -410,9 +749,15 @@
       "contact_email": "admissions@mail.au.edu.pk",
       "contact_phone": "+92-51-9262557",
       "overview": "Public sector university managed under the Pakistan Air Force, known for aerospace, mechanical, cyber security, and business.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-biz", "cat-soc"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-biz",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-24",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "bahria",
@@ -427,9 +772,16 @@
       "contact_email": "adm@bahria.edu.pk",
       "contact_phone": "+92-51-9260002",
       "overview": "Federal university with campuses in Islamabad, Karachi, and Lahore providing multidisciplinary programmes.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz", "cat-med", "cat-soc"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz",
+        "cat-med",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-20",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "numl",
@@ -444,9 +796,14 @@
       "contact_email": "admissions@numl.edu.pk",
       "contact_phone": "+92-51-9265100",
       "overview": "Specialized public university focused on languages, linguistics, international relations, computing, and social sciences.",
-      "category_ids": ["cat-soc", "cat-biz", "cat-cs"],
+      "category_ids": [
+        "cat-soc",
+        "cat-biz",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-18",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "iium",
@@ -461,9 +818,16 @@
       "contact_email": "admissions@iiu.edu.pk",
       "contact_phone": "+92-51-9019616",
       "overview": "Public university with an international student body offering programmes in Islamic studies, law, engineering, and sciences.",
-      "category_ids": ["cat-soc", "cat-eng", "cat-cs", "cat-biz", "cat-sci"],
+      "category_ids": [
+        "cat-soc",
+        "cat-eng",
+        "cat-cs",
+        "cat-biz",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-17",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "szabist",
@@ -478,9 +842,15 @@
       "contact_email": "admissions@szabist.edu.pk",
       "contact_phone": "+92-21-111-922-478",
       "overview": "Multi-campus private institute offering programmes in management sciences, media, computing, and biosciences.",
-      "category_ids": ["cat-biz", "cat-cs", "cat-soc", "cat-sci"],
+      "category_ids": [
+        "cat-biz",
+        "cat-cs",
+        "cat-soc",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-19",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Higher Education Commission (HEC) Pakistan"
     },
     {
       "id": "oxford",
@@ -489,15 +859,22 @@
       "country_id": "GBR",
       "city_id": "c-oxf",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://ox.ac.uk",
       "admissions_url": "https://www.ox.ac.uk/admissions",
       "contact_email": "study@ox.ac.uk",
       "contact_phone": "+44-1865-270000",
       "overview": "Collegiate research university in Oxford, England. Oldest university in the English-speaking world.",
-      "category_ids": ["cat-sci", "cat-soc", "cat-eng", "cat-cs", "cat-med"],
+      "category_ids": [
+        "cat-sci",
+        "cat-soc",
+        "cat-eng",
+        "cat-cs",
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-01",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Office for Students (OfS)"
     },
     {
       "id": "cambridge",
@@ -506,15 +883,22 @@
       "country_id": "GBR",
       "city_id": "c-cam",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://cam.ac.uk",
       "admissions_url": "https://www.undergraduate.study.cam.ac.uk",
       "contact_email": "admissions@cam.ac.uk",
       "contact_phone": "+44-1223-337733",
       "overview": "Collegiate research university in Cambridge, United Kingdom. Founded in 1209, world-renowned for academic rigor.",
-      "category_ids": ["cat-sci", "cat-eng", "cat-cs", "cat-med", "cat-soc"],
+      "category_ids": [
+        "cat-sci",
+        "cat-eng",
+        "cat-cs",
+        "cat-med",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-01",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Office for Students (OfS)"
     },
     {
       "id": "imperial",
@@ -523,15 +907,22 @@
       "country_id": "GBR",
       "city_id": "c-lon",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://imperial.ac.uk",
       "admissions_url": "https://www.imperial.ac.uk/study",
       "contact_email": "admissions.enquiries@imperial.ac.uk",
       "contact_phone": "+44-20-7589-5111",
       "overview": "Specialized global institution dedicated to science, engineering, business, and medicine.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-sci", "cat-med", "cat-biz"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-sci",
+        "cat-med",
+        "cat-biz"
+      ],
       "last_verified_at": "2026-09-05",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Office for Students (OfS)"
     },
     {
       "id": "harvard",
@@ -540,15 +931,22 @@
       "country_id": "USA",
       "city_id": "c-bos",
       "institution_type": "Private",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://harvard.edu",
       "admissions_url": "https://college.harvard.edu/admissions",
       "contact_email": "college@fas.harvard.edu",
       "contact_phone": "+1-617-495-1551",
       "overview": "Private Ivy League research university founded in 1636 in Cambridge, Massachusetts.",
-      "category_ids": ["cat-soc", "cat-sci", "cat-biz", "cat-med", "cat-cs"],
+      "category_ids": [
+        "cat-soc",
+        "cat-sci",
+        "cat-biz",
+        "cat-med",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-08",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "NECHE (USA)"
     },
     {
       "id": "mit",
@@ -557,15 +955,22 @@
       "country_id": "USA",
       "city_id": "c-bos",
       "institution_type": "Private",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://mit.edu",
       "admissions_url": "https://mitadmissions.org",
       "contact_email": "admissions@mit.edu",
       "contact_phone": "+1-617-253-3400",
       "overview": "World's foremost polytechnic research institute renowned for pioneering technological breakthroughs and AI.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-sci", "cat-biz", "cat-art"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-sci",
+        "cat-biz",
+        "cat-art"
+      ],
       "last_verified_at": "2026-09-08",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "NECHE (USA)"
     },
     {
       "id": "stanford",
@@ -574,15 +979,22 @@
       "country_id": "USA",
       "city_id": "c-sta",
       "institution_type": "Private",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://stanford.edu",
       "admissions_url": "https://admission.stanford.edu",
       "contact_email": "admission@stanford.edu",
       "contact_phone": "+1-650-723-2091",
       "overview": "Silicon Valley's premier research university, famed for entrepreneurship, technology, computer science, and medicine.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz", "cat-med", "cat-soc"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz",
+        "cat-med",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-10",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "WSCUC (USA)"
     },
     {
       "id": "toronto",
@@ -591,15 +1003,22 @@
       "country_id": "CAN",
       "city_id": "c-tor",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://utoronto.ca",
       "admissions_url": "https://future.utoronto.ca",
       "contact_email": "admissions@utoronto.ca",
       "contact_phone": "+1-416-978-2190",
       "overview": "Canada's leading research university with top faculties in machine learning, engineering, medicine, and social sciences.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-med", "cat-biz", "cat-soc"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-med",
+        "cat-biz",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-11",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Ontario Ministry of Colleges"
     },
     {
       "id": "mcgill",
@@ -608,15 +1027,22 @@
       "country_id": "CAN",
       "city_id": "c-mon",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://mcgill.ca",
       "admissions_url": "https://www.mcgill.ca/undergraduate-admissions",
       "contact_email": "admissions@mcgill.ca",
       "contact_phone": "+1-514-398-7878",
       "overview": "Montreal-based public research university with an international student body and renowned faculty of medicine.",
-      "category_ids": ["cat-med", "cat-sci", "cat-eng", "cat-soc", "cat-biz"],
+      "category_ids": [
+        "cat-med",
+        "cat-sci",
+        "cat-eng",
+        "cat-soc",
+        "cat-biz"
+      ],
       "last_verified_at": "2026-09-11",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "MES Quebec"
     },
     {
       "id": "tum",
@@ -625,15 +1051,21 @@
       "country_id": "DEU",
       "city_id": "c-mun",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://tum.de",
       "admissions_url": "https://www.tum.de/en/studies/application",
       "contact_email": "study@tum.de",
       "contact_phone": "+49-89-289-01",
       "overview": "Top European university for engineering, informatics, and natural sciences, with low public tuition rates.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-sci", "cat-med"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-sci",
+        "cat-med"
+      ],
       "last_verified_at": "2026-09-02",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Bavarian State Ministry"
     },
     {
       "id": "heidelberg",
@@ -642,15 +1074,20 @@
       "country_id": "DEU",
       "city_id": "c-hei",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://uni-heidelberg.de",
       "admissions_url": "https://www.uni-heidelberg.de/en/study/international-studies",
       "contact_email": "studium@uni-heidelberg.de",
       "contact_phone": "+49-6221-54-5454",
       "overview": "Germany's oldest university (founded 1386), renowned worldwide for medicine, physics, and humanities.",
-      "category_ids": ["cat-med", "cat-sci", "cat-soc"],
+      "category_ids": [
+        "cat-med",
+        "cat-sci",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-02",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Ministry of Science Baden-Württemberg"
     },
     {
       "id": "unimelb",
@@ -659,15 +1096,22 @@
       "country_id": "AUS",
       "city_id": "c-mel",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://unimelb.edu.au",
       "admissions_url": "https://study.unimelb.edu.au",
       "contact_email": "admissions@unimelb.edu.au",
       "contact_phone": "+61-3-9035-5511",
       "overview": "Australia's number-one ranked university, recognized for research excellence and the flexible Melbourne Curriculum.",
-      "category_ids": ["cat-biz", "cat-eng", "cat-med", "cat-soc", "cat-cs"],
+      "category_ids": [
+        "cat-biz",
+        "cat-eng",
+        "cat-med",
+        "cat-soc",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-07",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "TEQSA (Australia)"
     },
     {
       "id": "nus",
@@ -676,15 +1120,22 @@
       "country_id": "SGP",
       "city_id": "c-sgp",
       "institution_type": "Autonomous",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://nus.edu.sg",
       "admissions_url": "https://nus.edu.sg/admissions",
       "contact_email": "admissions@nus.edu.sg",
       "contact_phone": "+65-6516-1010",
       "overview": "Flagship university in Singapore consistently ranked among Asia's top institutions for computing and engineering.",
-      "category_ids": ["cat-cs", "cat-eng", "cat-biz", "cat-sci", "cat-soc"],
+      "category_ids": [
+        "cat-cs",
+        "cat-eng",
+        "cat-biz",
+        "cat-sci",
+        "cat-soc"
+      ],
       "last_verified_at": "2026-09-04",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Ministry of Education Singapore"
     },
     {
       "id": "metu",
@@ -693,15 +1144,21 @@
       "country_id": "TUR",
       "city_id": "c-ank",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://metu.edu.tr",
       "admissions_url": "https://iso.metu.edu.tr",
       "contact_email": "iso@metu.edu.tr",
       "contact_phone": "+90-312-210-2000",
       "overview": "English-medium technical university in Ankara, known for engineering, architecture, and scientific research.",
-      "category_ids": ["cat-eng", "cat-cs", "cat-art", "cat-sci"],
+      "category_ids": [
+        "cat-eng",
+        "cat-cs",
+        "cat-art",
+        "cat-sci"
+      ],
       "last_verified_at": "2026-09-06",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "YÖK (Council of Higher Education)"
     },
     {
       "id": "malaya",
@@ -710,29 +1167,112 @@
       "country_id": "MYS",
       "city_id": "c-kul",
       "institution_type": "Public",
-      "hec_recognized": true,
+      "hec_recognized": false,
       "official_website": "https://um.edu.my",
       "admissions_url": "https://study.um.edu.my",
       "contact_email": "study@um.edu.my",
       "contact_phone": "+60-3-7967-3444",
       "overview": "Malaysia's oldest and highest-ranked university located in Kuala Lumpur, offering top engineering and medical programmes.",
-      "category_ids": ["cat-eng", "cat-med", "cat-biz", "cat-cs"],
+      "category_ids": [
+        "cat-eng",
+        "cat-med",
+        "cat-biz",
+        "cat-cs"
+      ],
       "last_verified_at": "2026-09-06",
-      "status": "published"
+      "status": "published",
+      "accreditation_body": "Malaysian Qualifications Agency (MQA)"
     }
   ],
   "campuses": [
-    { "id": "cmp-nust-isb", "institution_id": "nust", "name": "Main Campus Sector H-12", "city_id": "c-isb", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-lums-dha", "institution_id": "lums", "name": "Main DHA Campus", "city_id": "c-lhr", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-giki-topi", "institution_id": "giki", "name": "Topi Main Residential Campus", "city_id": "c-topi", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-fast-isb", "institution_id": "fast-nu", "name": "Islamabad H-9 Campus", "city_id": "c-isb", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-fast-lhr", "institution_id": "fast-nu", "name": "Lahore Faisal Town Campus", "city_id": "c-lhr", "is_main_campus": false, "hec_recognized": true },
-    { "id": "cmp-fast-khi", "institution_id": "fast-nu", "name": "Karachi Main Campus", "city_id": "c-khi", "is_main_campus": false, "hec_recognized": true },
-    { "id": "cmp-cui-isb", "institution_id": "comsats", "name": "Islamabad Park Road Campus", "city_id": "c-isb", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-cui-lhr", "institution_id": "comsats", "name": "Lahore Defence Road Campus", "city_id": "c-lhr", "is_main_campus": false, "hec_recognized": true },
-    { "id": "cmp-cui-abt", "institution_id": "comsats", "name": "Abbottabad Campus", "city_id": "c-abt", "is_main_campus": false, "hec_recognized": true },
-    { "id": "cmp-uet-lhr", "institution_id": "uet-lahore", "name": "GT Road Main Campus", "city_id": "c-lhr", "is_main_campus": true, "hec_recognized": true },
-    { "id": "cmp-iba-main", "institution_id": "iba-karachi", "name": "University Road Main Campus", "city_id": "c-khi", "is_main_campus": true, "hec_recognized": true }
+    {
+      "id": "cmp-nust-isb",
+      "institution_id": "nust",
+      "name": "Main Campus Sector H-12",
+      "city_id": "c-isb",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-lums-dha",
+      "institution_id": "lums",
+      "name": "Main DHA Campus",
+      "city_id": "c-lhr",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-giki-topi",
+      "institution_id": "giki",
+      "name": "Topi Main Residential Campus",
+      "city_id": "c-topi",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-fast-isb",
+      "institution_id": "fast-nu",
+      "name": "Islamabad H-9 Campus",
+      "city_id": "c-isb",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-fast-lhr",
+      "institution_id": "fast-nu",
+      "name": "Lahore Faisal Town Campus",
+      "city_id": "c-lhr",
+      "is_main_campus": false,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-fast-khi",
+      "institution_id": "fast-nu",
+      "name": "Karachi Main Campus",
+      "city_id": "c-khi",
+      "is_main_campus": false,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-cui-isb",
+      "institution_id": "comsats",
+      "name": "Islamabad Park Road Campus",
+      "city_id": "c-isb",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-cui-lhr",
+      "institution_id": "comsats",
+      "name": "Lahore Defence Road Campus",
+      "city_id": "c-lhr",
+      "is_main_campus": false,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-cui-abt",
+      "institution_id": "comsats",
+      "name": "Abbottabad Campus",
+      "city_id": "c-abt",
+      "is_main_campus": false,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-uet-lhr",
+      "institution_id": "uet-lahore",
+      "name": "GT Road Main Campus",
+      "city_id": "c-lhr",
+      "is_main_campus": true,
+      "hec_recognized": true
+    },
+    {
+      "id": "cmp-iba-main",
+      "institution_id": "iba-karachi",
+      "name": "University Road Main Campus",
+      "city_id": "c-khi",
+      "is_main_campus": true,
+      "hec_recognized": true
+    }
   ],
   "programmes": [
     {
@@ -905,7 +1445,7 @@
       "id": "elg-nust-cs",
       "programme_id": "prog-nust-cs",
       "rule_type": "min_percentage",
-      "min_percentage": 60.00,
+      "min_percentage": 60.0,
       "required_subjects": "Mathematics, Physics, Chemistry or Computer Science",
       "accepted_entry_tests": "NUST Entry Test (NET-1, NET-2, NET-3, NET-4), ACT / SAT Subject",
       "rule_explanation": "Minimum 60% aggregate in HSSC (Pre-Engineering / ICS) or A-Level equivalent with Mathematics & Physics.",
@@ -918,7 +1458,7 @@
       "id": "elg-nust-se",
       "programme_id": "prog-nust-se",
       "rule_type": "min_percentage",
-      "min_percentage": 60.00,
+      "min_percentage": 60.0,
       "required_subjects": "Mathematics, Physics, Chemistry or Computer Studies",
       "accepted_entry_tests": "NUST Entry Test (NET)",
       "rule_explanation": "Minimum 60% aggregate marks in F.Sc Pre-Engineering / Computer Science or equivalent British GCE A-Levels.",
@@ -931,7 +1471,7 @@
       "id": "elg-lums-cs",
       "programme_id": "prog-lums-cs",
       "rule_type": "min_percentage",
-      "min_percentage": 70.00,
+      "min_percentage": 70.0,
       "required_subjects": "Mathematics (Compulsory) and 2 sciences",
       "accepted_entry_tests": "SAT-I (Score >= 1300 recommended) or LUMS Common Admission Test (LCAT)",
       "rule_explanation": "Minimum 70% in Matric/O-Level and F.Sc/A-Levels with strong quantitative preparation.",
@@ -944,7 +1484,7 @@
       "id": "elg-fast-cs",
       "programme_id": "prog-fast-cs",
       "rule_type": "min_percentage",
-      "min_percentage": 50.00,
+      "min_percentage": 50.0,
       "required_subjects": "Mathematics at HSSC / A-Level",
       "accepted_entry_tests": "FAST National University Admission Test (NU Test) or NTS-NAT",
       "rule_explanation": "At least 50% marks in Intermediate (HSSC) with Mathematics or equivalent examination.",
@@ -957,7 +1497,7 @@
       "id": "elg-aku-mbbs",
       "programme_id": "prog-aku-mbbs",
       "rule_type": "min_percentage",
-      "min_percentage": 65.00,
+      "min_percentage": 65.0,
       "required_subjects": "Biology, Chemistry, Physics/Math",
       "accepted_entry_tests": "AKU Medical College Admission Test & PMDC MDCAT",
       "rule_explanation": "Minimum 65% in HSSC Pre-Medical or equivalent British A-Level (with Biology & Chemistry).",
@@ -970,7 +1510,7 @@
       "id": "elg-iba-bba",
       "programme_id": "prog-iba-bba",
       "rule_type": "min_percentage",
-      "min_percentage": 65.00,
+      "min_percentage": 65.0,
       "required_subjects": "Any discipline with Mathematics or Quantitative Aptitude",
       "accepted_entry_tests": "IBA Aptitude Test or SAT-I (Math >= 600, EBRW >= 600)",
       "rule_explanation": "Minimum 65% in HSSC or minimum grades B-B-C in British A-Levels.",
@@ -978,6 +1518,110 @@
       "effective_session": "2025-2026",
       "source_url": "https://admissions.iba.edu.pk/criteria.php",
       "last_verified_at": "2026-09-19"
+    },
+    {
+      "id": "elg-nust-ee",
+      "programme_id": "prog-nust-ee",
+      "rule_type": "min_percentage",
+      "min_percentage": 60.0,
+      "required_subjects": "Mathematics, Physics, Chemistry",
+      "accepted_entry_tests": "NUST Entry Test (NET Engineering), SAT Subject",
+      "rule_explanation": "Minimum 60% aggregate marks in F.Sc (Pre-Engineering) or equivalent British A-Levels with Physics, Chemistry and Mathematics.",
+      "caveat": "Guidance only based on published rules. Final admission depends on competitive merit position and available seats.",
+      "effective_session": "2025-2026",
+      "source_url": "https://ugadmissions.nust.edu.pk/eligibility",
+      "last_verified_at": "2026-09-20"
+    },
+    {
+      "id": "elg-lums-bba",
+      "programme_id": "prog-lums-bba",
+      "rule_type": "min_percentage",
+      "min_percentage": 70.0,
+      "required_subjects": "Mathematics, English",
+      "accepted_entry_tests": "LCAT or SAT-I",
+      "rule_explanation": "Minimum 70% in Matriculation / O-Levels (at least 8 subjects) and at least 3 principal subjects in British A-Levels (grades BBC or better) or equivalent F.Sc/FA.",
+      "caveat": "Guidance only based on published criteria. LUMS evaluates holistic profiles including personal statement, extracurriculars, and admissions test score.",
+      "effective_session": "2025-2026",
+      "source_url": "https://admissions.lums.edu.pk/undergraduate-eligibility",
+      "last_verified_at": "2026-09-18"
+    },
+    {
+      "id": "elg-giki-ai",
+      "programme_id": "prog-giki-ai",
+      "rule_type": "min_percentage",
+      "min_percentage": 60.0,
+      "required_subjects": "Mathematics, Physics",
+      "accepted_entry_tests": "GIKI Admission Test",
+      "rule_explanation": "Minimum 60% aggregate marks in HSSC (Pre-Engineering or ICS with Mathematics & Physics) or equivalent British A-Level examination.",
+      "caveat": "Guidance only based on published rules. Admission is competitive and based on combined GIKI entrance test and academic score.",
+      "effective_session": "2025-2026",
+      "source_url": "https://giki.edu.pk/admissions/undergraduate/eligibility/",
+      "last_verified_at": "2026-09-15"
+    },
+    {
+      "id": "elg-fast-se",
+      "programme_id": "prog-fast-se",
+      "rule_type": "min_percentage",
+      "min_percentage": 50.0,
+      "required_subjects": "Mathematics, Physics",
+      "accepted_entry_tests": "NU Admission Test, NTS NAT-IE, SAT",
+      "rule_explanation": "At least 50% marks in Intermediate (HSSC) Pre-Engineering or ICS with Mathematics, or equivalent British A-Level examination.",
+      "caveat": "Guidance only based on published rules. Campus allocation and merit list depends on competitive entrance test performance.",
+      "effective_session": "2025-2026",
+      "source_url": "https://nu.edu.pk/Admissions/EligibilityCriteria",
+      "last_verified_at": "2026-09-22"
+    },
+    {
+      "id": "elg-uet-me",
+      "programme_id": "prog-uet-me",
+      "rule_type": "min_percentage",
+      "min_percentage": 60.0,
+      "required_subjects": "Physics, Mathematics, Chemistry",
+      "accepted_entry_tests": "ECAT (Combined Entry Test)",
+      "rule_explanation": "At least 60% marks in F.Sc (Pre-Engineering) or equivalent British A-Levels, with qualifying score in official ECAT examination.",
+      "caveat": "Guidance only based on published rules. Final admission determined strictly by UET aggregate merit formula.",
+      "effective_session": "2025-2026",
+      "source_url": "https://admission.uet.edu.pk/guidelines",
+      "last_verified_at": "2026-09-10"
+    },
+    {
+      "id": "elg-oxf-cs",
+      "programme_id": "prog-oxf-cs",
+      "rule_type": "qualitative_and_testing",
+      "min_percentage": null,
+      "required_subjects": "Mathematics (Further Mathematics strongly recommended)",
+      "accepted_entry_tests": "MAT (Mathematics Admissions Test)",
+      "rule_explanation": "Standard conditional offer requires A*AA at British A-Level with A* in Mathematics, Further Mathematics or Computer Science, plus competitive score in the Oxford MAT and collegiate interview.",
+      "caveat": "Guidance only. Oxford admissions involve shortlisting, college interview performance, MAT test scores, and UCAS personal reference.",
+      "effective_session": "2025-2026",
+      "source_url": "https://www.ox.ac.uk/admissions/undergraduate/courses/course-listing/computer-science",
+      "last_verified_at": "2026-09-01"
+    },
+    {
+      "id": "elg-cam-eng",
+      "programme_id": "prog-cam-eng",
+      "rule_type": "qualitative_and_testing",
+      "min_percentage": null,
+      "required_subjects": "Mathematics and Physics",
+      "accepted_entry_tests": "ESAT (Engineering and Science Admissions Test)",
+      "rule_explanation": "Typical offer is A*A*A at British A-Level including Mathematics and Physics, plus college interview and qualifying score on the ESAT assessment.",
+      "caveat": "Guidance only. Cambridge college admission decisions consider ESAT, interview, written assessment, and teacher recommendation.",
+      "effective_session": "2025-2026",
+      "source_url": "https://www.undergraduate.study.cam.ac.uk/courses/engineering",
+      "last_verified_at": "2026-09-05"
+    },
+    {
+      "id": "elg-tum-cs",
+      "programme_id": "prog-tum-cs",
+      "rule_type": "qualitative_and_testing",
+      "min_percentage": null,
+      "required_subjects": "Higher Mathematics, Informatics/Sciences",
+      "accepted_entry_tests": "TUM Aptitude Assessment (Eignungsverfahren)",
+      "rule_explanation": "Recognized Higher Education Entrance Qualification (German Abitur or validated international secondary equivalence) evaluated via TUM two-stage aptitude assessment.",
+      "caveat": "Guidance only. Applicants who do not reach direct admission point threshold must participate in a 20-minute assessment interview.",
+      "effective_session": "2025-2026",
+      "source_url": "https://www.cit.tum.de/en/cit/studies/degree-programs/bachelor-informatics/",
+      "last_verified_at": "2026-09-02"
     }
   ],
   "admissions": [
@@ -1044,9 +1688,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 185000.00,
-      "admission_fee_onetime": 35000.00,
-      "security_deposit": 10000.00,
+      "tuition_fee": 185000.0,
+      "admission_fee_onetime": 35000.0,
+      "security_deposit": 10000.0,
       "notes": "Tuition for National students. One-time admission & security dues apply upon enrollment. Hostel charges billed separately.",
       "source_url": "https://nust.edu.pk/admissions/fee-structure",
       "last_verified_at": "2026-09-20"
@@ -1057,9 +1701,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 590000.00,
-      "admission_fee_onetime": 85000.00,
-      "security_deposit": 25000.00,
+      "tuition_fee": 590000.0,
+      "admission_fee_onetime": 85000.0,
+      "security_deposit": 25000.0,
       "notes": "Includes lab charges and campus facilities fee. Need-blind financial aid & National Outreach Program (NOP) scholarships available.",
       "source_url": "https://lums.edu.pk/programmes/fee-structure",
       "last_verified_at": "2026-09-18"
@@ -1070,9 +1714,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 420000.00,
-      "admission_fee_onetime": 60000.00,
-      "security_deposit": 20000.00,
+      "tuition_fee": 420000.0,
+      "admission_fee_onetime": 60000.0,
+      "security_deposit": 20000.0,
       "notes": "Tuition fee per semester. Compulsory residential hostel dues and mess charges billed separately per semester.",
       "source_url": "https://giki.edu.pk/admissions/fee-structure",
       "last_verified_at": "2026-09-15"
@@ -1083,9 +1727,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 195000.00,
-      "admission_fee_onetime": 30000.00,
-      "security_deposit": 15000.00,
+      "tuition_fee": 195000.0,
+      "admission_fee_onetime": 30000.0,
+      "security_deposit": 15000.0,
       "notes": "Tuition fee calculated on 15–18 credit hours per regular semester. Security deposit is refundable.",
       "source_url": "https://nu.edu.pk/Admissions/FeeStructure",
       "last_verified_at": "2026-09-22"
@@ -1096,9 +1740,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Year",
-      "tuition_fee": 1450000.00,
-      "admission_fee_onetime": 120000.00,
-      "security_deposit": 30000.00,
+      "tuition_fee": 1450000.0,
+      "admission_fee_onetime": 120000.0,
+      "security_deposit": 30000.0,
       "notes": "Annual tuition fee. Substantial need-based financial assistance and student work-study programmes provided.",
       "source_url": "https://www.aku.edu/mcpk/fees/Pages/home.aspx",
       "last_verified_at": "2026-09-12"
@@ -1109,9 +1753,9 @@
       "academic_session": "2025-2026",
       "currency": "PKR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 380000.00,
-      "admission_fee_onetime": 50000.00,
-      "security_deposit": 20000.00,
+      "tuition_fee": 380000.0,
+      "admission_fee_onetime": 50000.0,
+      "security_deposit": 20000.0,
       "notes": "Includes library and sports facility fees. Financial assistance offered to qualifying candidates.",
       "source_url": "https://iba.edu.pk/fee-structure.php",
       "last_verified_at": "2026-09-19"
@@ -1122,12 +1766,103 @@
       "academic_session": "2025-2026",
       "currency": "EUR",
       "billing_basis": "Per Semester",
-      "tuition_fee": 85.00,
-      "admission_fee_onetime": 0.00,
-      "security_deposit": 0.00,
+      "tuition_fee": 85.0,
+      "admission_fee_onetime": 0.0,
+      "security_deposit": 0.0,
       "notes": "Public university basic student semester fee (Solidarity contribution & student union fee). Non-EU tuition may apply for certain programmes.",
       "source_url": "https://www.tum.de/en/studies/fees",
       "last_verified_at": "2026-09-02"
+    },
+    {
+      "id": "fee-nust-se",
+      "programme_id": "prog-nust-se",
+      "academic_session": "2025-2026",
+      "currency": "PKR",
+      "billing_basis": "Per Semester",
+      "tuition_fee": 185000.0,
+      "admission_fee_onetime": 35000.0,
+      "security_deposit": 10000.0,
+      "notes": "Tuition fee for regular semester. Security deposit is refundable upon graduation.",
+      "source_url": "https://nust.edu.pk/admissions/fee-structure",
+      "last_verified_at": "2026-09-20"
+    },
+    {
+      "id": "fee-nust-ee",
+      "programme_id": "prog-nust-ee",
+      "academic_session": "2025-2026",
+      "currency": "PKR",
+      "billing_basis": "Per Semester",
+      "tuition_fee": 185000.0,
+      "admission_fee_onetime": 35000.0,
+      "security_deposit": 10000.0,
+      "notes": "Engineering tuition per regular semester.",
+      "source_url": "https://nust.edu.pk/admissions/fee-structure",
+      "last_verified_at": "2026-09-20"
+    },
+    {
+      "id": "fee-lums-bba",
+      "programme_id": "prog-lums-bba",
+      "academic_session": "2025-2026",
+      "currency": "PKR",
+      "billing_basis": "Per Semester",
+      "tuition_fee": 590000.0,
+      "admission_fee_onetime": 85000.0,
+      "security_deposit": 25000.0,
+      "notes": "Standard Suleman Dawood School of Business semester tuition fee.",
+      "source_url": "https://lums.edu.pk/fee-structure",
+      "last_verified_at": "2026-09-18"
+    },
+    {
+      "id": "fee-fast-se",
+      "programme_id": "prog-fast-se",
+      "academic_session": "2025-2026",
+      "currency": "PKR",
+      "billing_basis": "Per Semester",
+      "tuition_fee": 195000.0,
+      "admission_fee_onetime": 30000.0,
+      "security_deposit": 20000.0,
+      "notes": "Standard undergraduate computing semester fee.",
+      "source_url": "https://nu.edu.pk/Admissions/FeeStructure",
+      "last_verified_at": "2026-09-22"
+    },
+    {
+      "id": "fee-uet-me",
+      "programme_id": "prog-uet-me",
+      "academic_session": "2025-2026",
+      "currency": "PKR",
+      "billing_basis": "Per Semester",
+      "tuition_fee": 75000.0,
+      "admission_fee_onetime": 25000.0,
+      "security_deposit": 10000.0,
+      "notes": "Subsidized public university undergraduate engineering tuition dues.",
+      "source_url": "https://admission.uet.edu.pk/fees",
+      "last_verified_at": "2026-09-10"
+    },
+    {
+      "id": "fee-oxf-cs",
+      "programme_id": "prog-oxf-cs",
+      "academic_session": "2025-2026",
+      "currency": "GBP",
+      "billing_basis": "Per Year",
+      "tuition_fee": 38550.0,
+      "admission_fee_onetime": 0.0,
+      "security_deposit": 0.0,
+      "notes": "Annual overseas student tuition rate for Computer Science. College living costs separate.",
+      "source_url": "https://www.ox.ac.uk/admissions/undergraduate/fees-and-funding/course-fees",
+      "last_verified_at": "2026-09-01"
+    },
+    {
+      "id": "fee-cam-eng",
+      "programme_id": "prog-cam-eng",
+      "academic_session": "2025-2026",
+      "currency": "GBP",
+      "billing_basis": "Per Year",
+      "tuition_fee": 39162.0,
+      "admission_fee_onetime": 0.0,
+      "security_deposit": 0.0,
+      "notes": "Annual international student tuition fee for undergraduate Engineering.",
+      "source_url": "https://www.undergraduate.study.cam.ac.uk/international-students/fees-costs",
+      "last_verified_at": "2026-09-05"
     }
   ]
 }

@@ -19,12 +19,18 @@ class UniSelectionApp extends StatefulWidget {
 
 class _UniSelectionAppState extends State<UniSelectionApp> {
   late Future<void> _initializationFuture;
-  bool _hasSelectedScope = true;
+  bool _hasSelectedScope = false;
 
   @override
   void initState() {
     super.initState();
-    _initializationFuture = widget.repository.initialize();
+    _initializationFuture = widget.repository.initialize().then((_) {
+      if (mounted) {
+        setState(() {
+          _hasSelectedScope = widget.repository.hasCompletedOnboarding;
+        });
+      }
+    });
   }
 
   @override
@@ -94,7 +100,7 @@ class _UniSelectionAppState extends State<UniSelectionApp> {
             );
           }
 
-          if (!_hasSelectedScope) {
+          if (!widget.repository.hasCompletedOnboarding && !_hasSelectedScope) {
             return ScopeSelectorScreen(
               repository: widget.repository,
               onScopeSelected: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' hide Category;
+import '../constants/app_config.dart';
 import '../models/country.dart';
 import '../models/city.dart';
 import '../models/category.dart';
@@ -11,19 +12,34 @@ import '../models/admission.dart';
 import '../models/fee_record.dart';
 import '../services/dataset_loader.dart';
 import '../services/local_storage_service.dart';
+import '../services/remote_api_service.dart';
+
+export '../services/remote_api_service.dart' show BackendSyncStatus;
 
 class UniSelectionRepository extends ChangeNotifier {
   final DatasetLoader _loader;
   final LocalStorageService _storage;
+  final RemoteApiService _remoteApi;
 
   UniSelectionRepository({
     DatasetLoader? loader,
     LocalStorageService? storage,
+    RemoteApiService? remoteApi,
   })  : _loader = loader ?? DatasetLoader(),
-        _storage = storage ?? LocalStorageService();
+        _storage = storage ?? LocalStorageService(),
+        _remoteApi = remoteApi ?? RemoteApiService();
+
+  RemoteApiService get remoteApi => _remoteApi;
+  LocalStorageService get storage => _storage;
 
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
+
+  BackendSyncStatus _backendStatus = BackendSyncStatus.unconfigured;
+  BackendSyncStatus get backendStatus => _backendStatus;
+
+  String? _lastBackendError;
+  String? get lastBackendError => _lastBackendError;
 
   List<Country> _countries = [];
   List<City> _cities = [];
@@ -48,13 +64,38 @@ class UniSelectionRepository extends ChangeNotifier {
   List<FeeRecord> get feeRecords => _feeRecords;
 
   String get activeScope => _storage.selectedScope;
+  bool get hasCompletedOnboarding => _storage.hasCompletedOnboarding;
+  Map<String, dynamic> get userProfile => _storage.userProfile;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     await _storage.init();
-    final data = await _loader.loadStarterData();
 
+    Map<String, dynamic>? data;
+
+    // Dual-Mode Operation (Live Supabase REST or Resilient Offline Seed)
+    if (AppConfig.isSupabaseConfigured) {
+      try {
+        data = await _remoteApi.fetchPublishedData();
+        _backendStatus = BackendSyncStatus.connected;
+        _lastBackendError = null;
+      } catch (e) {
+        _lastBackendError = e.toString();
+        _backendStatus = BackendSyncStatus.offlineFallback;
+        data = await _loader.loadStarterData();
+      }
+    } else {
+      _backendStatus = BackendSyncStatus.offlineFallback;
+      data = await _loader.loadStarterData();
+    }
+
+    _loadDataIntoState(data);
+    _isInitialized = true;
+    notifyListeners();
+  }
+
+  void _loadDataIntoState(Map<String, dynamic> data) {
     _countries = (data['countries'] as List<dynamic>?)
             ?.map((e) => Country.fromJson(e as Map<String, dynamic>))
             .toList() ??
@@ -104,13 +145,45 @@ class UniSelectionRepository extends ChangeNotifier {
             ?.map((e) => FeeRecord.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
+  }
 
-    _isInitialized = true;
-    notifyListeners();
+  Future<void> retryBackendSync() async {
+    if (AppConfig.isSupabaseConfigured) {
+      try {
+        final data = await _remoteApi.fetchPublishedData();
+        _backendStatus = BackendSyncStatus.connected;
+        _lastBackendError = null;
+        _loadDataIntoState(data);
+        notifyListeners();
+      } catch (e) {
+        _lastBackendError = e.toString();
+        _backendStatus = BackendSyncStatus.offlineFallback;
+        notifyListeners();
+      }
+    } else {
+      _backendStatus = BackendSyncStatus.offlineFallback;
+      notifyListeners();
+    }
   }
 
   Future<void> setScope(String scope) async {
     await _storage.setScope(scope);
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding(String scope) async {
+    await _storage.setScope(scope);
+    await _storage.setCompletedOnboarding(true);
+    notifyListeners();
+  }
+
+  Future<void> resetOnboarding() async {
+    await _storage.setCompletedOnboarding(false);
+    notifyListeners();
+  }
+
+  Future<void> saveProfile(Map<String, dynamic> profile) async {
+    await _storage.saveProfile(profile);
     notifyListeners();
   }
 
@@ -124,11 +197,17 @@ class UniSelectionRepository extends ChangeNotifier {
     String? cityId,
     String? query,
     String? institutionType,
+    String? status, // 'all', 'published', 'in_review', 'draft'
   }) {
     final effectiveScope = scope ?? _storage.selectedScope;
 
     return _institutions.where((inst) {
-      // 1. Scope filter
+      // 1. Status filter (default to published unless admin view requests all/specific)
+      if (status != null && status != 'all') {
+        if (inst.status != status) return false;
+      }
+
+      // 2. Scope filter
       if (effectiveScope == 'national' && inst.countryId != 'PAK') {
         return false;
       }
@@ -136,21 +215,21 @@ class UniSelectionRepository extends ChangeNotifier {
         return false;
       }
 
-      // 2. Category filter
+      // 3. Category filter
       if (categoryId != null && categoryId.isNotEmpty) {
         if (!inst.categoryIds.contains(categoryId)) {
           return false;
         }
       }
 
-      // 3. City filter
+      // 4. City filter
       if (cityId != null && cityId.isNotEmpty) {
         if (inst.cityId != cityId) {
           return false;
         }
       }
 
-      // 4. Institution Type
+      // 5. Institution Type
       if (institutionType != null && institutionType.isNotEmpty) {
         if (inst.institutionType.toLowerCase() !=
             institutionType.toLowerCase()) {
@@ -158,7 +237,7 @@ class UniSelectionRepository extends ChangeNotifier {
         }
       }
 
-      // 5. Keyword Query
+      // 6. Keyword Query (Matches name, acronym, city, or offered programmes/disciplines)
       if (query != null && query.trim().isNotEmpty) {
         final q = query.trim().toLowerCase();
         final matchName = inst.name.toLowerCase().contains(q);
@@ -166,7 +245,12 @@ class UniSelectionRepository extends ChangeNotifier {
             inst.shortName?.toLowerCase().contains(q) ?? false;
         final city = getCity(inst.cityId);
         final matchCity = city?.name.toLowerCase().contains(q) ?? false;
-        if (!matchName && !matchShort && !matchCity) {
+        final instProgrammes = getProgrammesForInstitution(inst.id);
+        final matchProgramme = instProgrammes.any((p) =>
+            p.name.toLowerCase().contains(q) ||
+            p.degreeLevel.toLowerCase().contains(q));
+
+        if (!matchName && !matchShort && !matchCity && !matchProgramme) {
           return false;
         }
       }
@@ -226,13 +310,27 @@ class UniSelectionRepository extends ChangeNotifier {
       if (query != null && query.trim().isNotEmpty) {
         final q = query.trim().toLowerCase();
         final matchProg = p.name.toLowerCase().contains(q);
-        final matchInst = inst.name.toLowerCase().contains(q);
+        final matchInst = inst.name.toLowerCase().contains(q) ||
+            (inst.shortName?.toLowerCase().contains(q) ?? false);
         if (!matchProg && !matchInst) return false;
       }
 
       return true;
     }).toList();
   }
+
+  List<Programme> getProgrammes({
+    String? disciplineId,
+    String? degreeLevel,
+    String? query,
+    String? scope,
+  }) =>
+      searchProgrammes(
+        disciplineId: disciplineId,
+        degreeLevel: degreeLevel,
+        query: query,
+        scope: scope,
+      );
 
   Programme? getProgrammeById(String id) {
     try {
@@ -314,6 +412,11 @@ class UniSelectionRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearShortlist() async {
+    await _storage.clearShortlist();
+    notifyListeners();
+  }
+
   List<Institution> getShortlistedInstitutions() {
     return _institutions
         .where((i) => _storage.shortlistedInstitutionIds.contains(i.id))
@@ -326,19 +429,68 @@ class UniSelectionRepository extends ChangeNotifier {
         .toList();
   }
 
+  // Admin / Editorial Status Mutation
+  void updateInstitutionStatus(String id, String newStatus) {
+    final index = _institutions.indexWhere((i) => i.id == id);
+    if (index != -1) {
+      final old = _institutions[index];
+      _institutions[index] = Institution(
+        id: old.id,
+        name: old.name,
+        shortName: old.shortName,
+        countryId: old.countryId,
+        cityId: old.cityId,
+        institutionType: old.institutionType,
+        hecRecognized: old.hecRecognized,
+        accreditationBody: old.accreditationBody,
+        officialWebsite: old.officialWebsite,
+        admissionsUrl: old.admissionsUrl,
+        contactEmail: old.contactEmail,
+        contactPhone: old.contactPhone,
+        logoUrl: old.logoUrl,
+        overview: old.overview,
+        categoryIds: old.categoryIds,
+        lastVerifiedAt: old.lastVerifiedAt,
+        status: newStatus,
+      );
+      notifyListeners();
+    }
+  }
+
   // Admin / Editorial Summary
   Map<String, dynamic> getVerificationSummary() {
     final totalInst = _institutions.length;
-    final verifiedInst =
+    final publishedInst =
         _institutions.where((i) => i.status == 'published').length;
+    final inReviewInst =
+        _institutions.where((i) => i.status == 'in_review').length;
+    final draftInst =
+        _institutions.where((i) => i.status == 'draft').length;
     final totalProgrammes = _programmes.length;
     final totalRules = _eligibilityRules.length;
     final totalAdmissions = _admissions.length;
     final totalFees = _feeRecords.length;
 
+    // Detect stale records (> 180 days since lastVerifiedAt)
+    final now = DateTime.now();
+    int staleCount = 0;
+    for (final inst in _institutions) {
+      if (inst.lastVerifiedAt.isNotEmpty) {
+        try {
+          final dt = DateTime.parse(inst.lastVerifiedAt);
+          if (now.difference(dt).inDays > 180) {
+            staleCount++;
+          }
+        } catch (_) {}
+      }
+    }
+
     return {
       'totalInstitutions': totalInst,
-      'publishedInstitutions': verifiedInst,
+      'publishedInstitutions': publishedInst,
+      'inReviewInstitutions': inReviewInst,
+      'draftInstitutions': draftInst,
+      'staleInstitutions': staleCount,
       'nationalInstitutions':
           _institutions.where((i) => i.countryId == 'PAK').length,
       'internationalInstitutions':
@@ -349,7 +501,7 @@ class UniSelectionRepository extends ChangeNotifier {
       'totalFeeRecords': totalFees,
       'verificationRate': totalInst == 0
           ? 100.0
-          : ((verifiedInst / totalInst) * 100).toStringAsFixed(1),
+          : ((publishedInst / totalInst) * 100).toStringAsFixed(1),
     };
   }
 }

@@ -27,14 +27,12 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
   @override
   void initState() {
     super.initState();
-    final programmesWithRules = widget.repository.programmes.where((p) {
-      return widget.repository.getEligibilityRuleForProgramme(p.id) != null;
-    }).toList();
-
-    if (widget.initialProgrammeId != null) {
+    final allProgrammes = widget.repository.programmes;
+    if (widget.initialProgrammeId != null &&
+        allProgrammes.any((p) => p.id == widget.initialProgrammeId)) {
       _selectedProgrammeId = widget.initialProgrammeId;
-    } else if (programmesWithRules.isNotEmpty) {
-      _selectedProgrammeId = programmesWithRules.first.id;
+    } else if (allProgrammes.isNotEmpty) {
+      _selectedProgrammeId = allProgrammes.first.id;
     }
   }
 
@@ -67,6 +65,25 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
       setState(() {
         _evaluationResult = rule.evaluate(score);
       });
+    } else {
+      final prog = widget.repository.getProgrammeById(_selectedProgrammeId!);
+      setState(() {
+        _evaluationResult = EligibilityResult(
+          status: EligibilityStatus.requiresVerification,
+          title: 'Check Official Admissions Portal',
+          message: 'No automated rule is registered for this degree. Please consult the published criteria.',
+          rule: EligibilityRule(
+            id: 'placeholder',
+            programmeId: _selectedProgrammeId!,
+            ruleType: 'qualitative',
+            ruleExplanation: 'Programme requirements require manual verification on the university portal.',
+            caveat: 'Guidance only based on published university rules. Admission is competitive.',
+            effectiveSession: '2025-2026',
+            sourceUrl: prog?.officialUrl ?? '',
+            lastVerifiedAt: DateTime.now().toIso8601String().substring(0, 10),
+          ),
+        );
+      });
     }
   }
 
@@ -79,9 +96,7 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final programmesWithRules = widget.repository.programmes.where((p) {
-      return widget.repository.getEligibilityRuleForProgramme(p.id) != null;
-    }).toList();
+    final allProgrammes = widget.repository.programmes;
 
     Programme? currentProgramme;
     if (_selectedProgrammeId != null) {
@@ -139,11 +154,13 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
                   isExpanded: true,
-                  initialValue: _selectedProgrammeId,
+                  initialValue: allProgrammes.any((p) => p.id == _selectedProgrammeId)
+                      ? _selectedProgrammeId
+                      : (allProgrammes.isNotEmpty ? allProgrammes.first.id : null),
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   ),
-                  items: programmesWithRules.map((prog) {
+                  items: allProgrammes.map((prog) {
                     final inst = widget.repository.getInstitutionById(prog.institutionId);
                     return DropdownMenuItem<String>(
                       value: prog.id,
@@ -161,12 +178,19 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
                     });
                   },
                 ),
-                if (currentRule != null && currentRule.minPercentage != null) ...[
+                if (currentRule != null) ...[
                   const SizedBox(height: 10),
-                  Text(
-                    'Published Baseline: Minimum ${currentRule.minPercentage!.toStringAsFixed(0)}% in ${currentRule.requiredSubjects ?? "prescribed subjects"}',
-                    style: const TextStyle(fontSize: 12, color: AppColors.secondary, fontWeight: FontWeight.w600),
-                  ),
+                  if (currentRule.minPercentage != null) ...[
+                    Text(
+                      'Published Baseline: Minimum ${currentRule.minPercentage!.toStringAsFixed(0)}% in ${currentRule.requiredSubjects ?? "prescribed subjects"}',
+                      style: const TextStyle(fontSize: 12, color: AppColors.secondary, fontWeight: FontWeight.w600),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Published Baseline: ${currentRule.requiredSubjects ?? "Qualitative & Entrance Assessment"}',
+                      style: const TextStyle(fontSize: 12, color: AppColors.secondary, fontWeight: FontWeight.w600),
+                    ),
+                  ],
                 ],
               ],
             ),
