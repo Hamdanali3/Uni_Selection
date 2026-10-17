@@ -1,0 +1,73 @@
+name: UniSelection CI
+
+on:
+  push:
+    branches: [ main, feat/*, audit-and-fixes ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  flutter-quality:
+    name: Flutter Analyze & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: flutter pub get
+
+      - name: Verify static analysis
+        working-directory: mobile
+        run: flutter analyze
+
+      - name: Execute unit & widget tests
+        working-directory: mobile
+        run: flutter test
+
+  python-sync-and-validation:
+    name: Python Sync Engine & Dataset Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio respx anyio httpx beautifulsoup4
+
+      - name: Validate dataset schema & parity
+        run: python data/validation/validate_dataset.py
+
+      - name: Run sync engine pytest suite
+        run: python -m pytest tests/test_sync_engine.py -v
+
+      - name: Test sync idempotency (CLI)
+        run: python -m data.sync.cli test-idempotency
+
+      - name: Test change detection (CLI)
+        run: python -m data.sync.cli test-change-detection
+
+      - name: Test safe failure & circuit breaking (CLI)
+        run: python -m data.sync.cli test-safe-failure
