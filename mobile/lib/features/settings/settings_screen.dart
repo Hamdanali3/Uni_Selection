@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/repositories/uniselection_repository.dart';
 import '../admin/admin_review_screen.dart';
+import '../admin/data_quality_dashboard_screen.dart';
 import '../profile/profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -247,6 +248,21 @@ class SettingsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (_) => AdminReviewScreen(repository: repository),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.analytics_outlined, color: AppColors.primary),
+                  title: const Text('Data Quality & Governance Dashboard', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Freshness metrics, entity breakdowns, and sync health', style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DataQualityDashboardScreen(repository: repository),
                       ),
                     );
                   },

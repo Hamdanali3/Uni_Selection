@@ -337,6 +337,58 @@ class _EligibilityScreenState extends State<EligibilityScreen> {
               ],
             ),
           ),
+          if (result.criteriaBreakdown.isNotEmpty) ...[
+            const Divider(height: 20),
+            const Text(
+              'Prerequisite Criteria Assessment:',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 8),
+            ...result.criteriaBreakdown.map((c) {
+              Color statusColor;
+              IconData statusIcon;
+              switch (c.status) {
+                case CriterionStatus.met:
+                  statusColor = const Color(0xFF0F766E);
+                  statusIcon = Icons.check_circle_outline;
+                  break;
+                case CriterionStatus.unmet:
+                  statusColor = const Color(0xFFB45309);
+                  statusIcon = Icons.highlight_off;
+                  break;
+                case CriterionStatus.unverified:
+                case CriterionStatus.notApplicable:
+                  statusColor = AppColors.textSecondary;
+                  statusIcon = Icons.help_outline;
+                  break;
+              }
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(statusIcon, size: 16, color: statusColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(c.name, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+                              Text(c.status.name.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: statusColor)),
+                            ],
+                          ),
+                          Text(c.explanation, style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
           const SizedBox(height: 14),
           if (result.rule.sourceUrl.isNotEmpty) ...[
             OutlinedButton.icon(

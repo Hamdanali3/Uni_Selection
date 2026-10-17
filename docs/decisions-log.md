@@ -73,3 +73,59 @@ This document records the foundational architecture and product decisions for Ph
 | Admin Interface | In-app data review & verification status inspector + CLI/Python validation | Resolved |
 | Push Notifications | Deferred to Phase 2; in-app deadline notices only for Phase 1 | Resolved |
 | Minimum Android | Android 7.0 (API Level 24) | Resolved |
+
+---
+
+# Phase 2 Architecture Decision Records (ADRs)
+
+## ADR-P2-001: Local-Only Privacy Architecture for Application Plans & Checklists
+- **Status:** Accepted
+- **Context:** Students tracking admission milestones and tasks often enter personal deadlines and intentions. Uploading these plans to a cloud server introduces privacy risks, GDPR/data sovereignty concerns, and database synchronization overhead.
+- **Decision:** Application plans, custom checklist tasks, and due dates are stored strictly on-device in `SharedPreferences` via `LocalStorageService`. No user application plans are transmitted or synchronized to Supabase or any remote backend.
+- **Consequences:** Guarantees absolute student privacy; zero liability for personal data breaches; eliminates network latency and offline syncing complexity.
+
+---
+
+## ADR-P2-002: Local Notifications Architecture Without Remote Push Relays
+- **Status:** Accepted
+- **Context:** Students require deadline reminders for upcoming admissions and scholarships, but standing up an external Firebase Cloud Messaging (FCM) / Apple Push Notification service (APNS) infrastructure requires user authentication, device token registries, and server maintenance.
+- **Decision:** Reminders are managed locally on the device using `NotificationService`. Reminders are scheduled directly against device time and local state.
+- **Consequences:** Zero external push infrastructure required; operates seamlessly without user registration or cloud server connectivity.
+
+---
+
+## ADR-P2-003: Deterministic Explainable Scoring Formula for Recommendations
+- **Status:** Accepted
+- **Context:** Personalized university matching often suffers from black-box recommendation models that produce opaque or biased outputs that cannot be audited or explained to students.
+- **Decision:** The recommendation engine (`RecommendationService`) uses a pure, deterministic mathematical formula with 100 points maximum across four transparent factors:
+  1. Discipline Alignment (35 points)
+  2. Degree Level Availability (25 points)
+  3. Location Match (20 points)
+  4. Academic Aggregate Compatibility (20 points)
+  Every recommendation displays an interactive factor breakdown showing points awarded and explanatory notes. No generative AI or black-box machine learning is used.
+- **Consequences:** 100% explainability, complete determinism (same inputs always produce identical rankings), and full student auditability.
+
+---
+
+## ADR-P2-004: Bounded Initial Set for International Country Guidance
+- **Status:** Accepted
+- **Context:** Offering unbounded international guidance leads to inaccurate or outdated immigration advice.
+- **Decision:** International guidance is strictly bounded to the 13 approved destination countries benchmarked in the dataset: Pakistan, United Kingdom, United States, Canada, Germany, Australia, Singapore, Turkey, Malaysia, New Zealand, Switzerland, Saudi Arabia, France, and China. All visa links and guidance must point directly to official government immigration portals.
+- **Consequences:** Protects students from predatory or unauthorized education agents; ensures every country link is authoritative.
+
+---
+
+## ADR-P2-005: Insert-Only Anonymous Row Level Security for Discrepancy Reports
+- **Status:** Accepted
+- **Context:** Students need to report data discrepancies anonymously without logging in, but public tables risk unauthorized scraping or leaking student submissions.
+- **Decision:** The `discrepancy_reports` table has RLS enabled with an `INSERT` policy for `anon` and `authenticated` roles (`WITH CHECK (true)`), but **zero `SELECT` access** for non-admin roles. Only `service_role` can read or resolve reports.
+- **Consequences:** Fully crowdsourced data accuracy without any risk of user submission harvesting or data leakage.
+
+---
+
+## ADR-P2-006: Human-in-the-Loop Governance for Upstream Regulatory Ingestion
+- **Status:** Accepted
+- **Context:** Automated scrapers or synchronizers could inadvertently ingest spurious or unverified regulatory changes that misinform students.
+- **Decision:** Ingested changes to accreditation, statutory recognition, or degree titles are routed to `review_queue` as pending items. No critical regulatory status mutation can be published to the mobile directory without explicit administrator confirmation.
+- **Consequences:** Prevents automated data corruption; guarantees statutory integrity.
+

@@ -4,6 +4,7 @@ import '../../core/repositories/uniselection_repository.dart';
 import '../institutions/institution_detail_screen.dart';
 import '../comparison/comparison_screen.dart';
 import '../programmes/programme_detail_screen.dart';
+import '../scholarships/scholarship_detail_screen.dart';
 
 class ShortlistScreen extends StatefulWidget {
   final UniSelectionRepository repository;
@@ -26,7 +27,7 @@ class _ShortlistScreenState extends State<ShortlistScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -39,19 +40,24 @@ class _ShortlistScreenState extends State<ShortlistScreen>
   Widget build(BuildContext context) {
     final savedInstitutions = widget.repository.getShortlistedInstitutions();
     final savedProgrammes = widget.repository.getShortlistedProgrammes();
+    final savedScholarships = widget.repository.getShortlistedScholarships();
+
+    final hasAny = savedInstitutions.isNotEmpty ||
+        savedProgrammes.isNotEmpty ||
+        savedScholarships.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Saved Shortlist'),
         actions: [
-          if (savedInstitutions.isNotEmpty || savedProgrammes.isNotEmpty) ...[
+          if (hasAny) ...[
             TextButton(
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: const Text('Clear Shortlist?'),
-                    content: const Text('Are you sure you want to remove all saved universities and programmes?'),
+                    content: const Text('Are you sure you want to remove all saved universities, programmes, and scholarships?'),
                     actions: [
                       TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
                       TextButton(
@@ -79,13 +85,14 @@ class _ShortlistScreenState extends State<ShortlistScreen>
           tabs: [
             Tab(text: 'Institutions (${savedInstitutions.length})'),
             Tab(text: 'Programmes (${savedProgrammes.length})'),
+            Tab(text: 'Scholarships (${savedScholarships.length})'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Institutions Tab
+          // 1. Institutions Tab
           savedInstitutions.isEmpty
               ? _buildEmptyState(
                   'No Saved Institutions',
@@ -183,7 +190,7 @@ class _ShortlistScreenState extends State<ShortlistScreen>
                   ],
                 ),
 
-          // Programmes Tab
+          // 2. Programmes Tab
           savedProgrammes.isEmpty
               ? _buildEmptyState(
                   'No Saved Programmes',
@@ -244,6 +251,71 @@ class _ShortlistScreenState extends State<ShortlistScreen>
                           onPressed: () {
                             widget.repository
                                 .toggleProgrammeShortlist(prog.id);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+          // 3. Scholarships Tab (Phase 2 P2-07)
+          savedScholarships.isEmpty
+              ? _buildEmptyState(
+                  'No Saved Scholarships',
+                  'Bookmark scholarships and financial aid opportunities to track them here.',
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: savedScholarships.length,
+                  itemBuilder: (context, index) {
+                    final s = savedScholarships[index];
+                    final inst = widget.repository.getInstitutionById(s.institutionId);
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ScholarshipDetailScreen(
+                                scholarship: s,
+                                repository: widget.repository,
+                              ),
+                            ),
+                          ).then((_) => setState(() {}));
+                        },
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.secondaryContainer.withAlpha(50),
+                          child: const Icon(Icons.stars_rounded, color: AppColors.secondary),
+                        ),
+                        title: Text(
+                          s.name,
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            Text(
+                              s.providerName ?? inst?.name ?? '',
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              s.coverageDetails,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline, color: AppColors.statusError),
+                          onPressed: () {
+                            widget.repository.toggleScholarshipShortlist(s.id);
                             setState(() {});
                           },
                         ),

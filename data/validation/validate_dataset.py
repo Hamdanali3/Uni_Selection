@@ -173,12 +173,40 @@ def validate_starter_dataset(file_path: str):
         if not is_valid_url(fee.get("source_url", "")):
             errors.append(f"Fee record '{fee_id}' has invalid source_url: '{fee.get('source_url')}'")
 
+    # 10. Scholarships (Phase 2 P2-01)
+    for sch in data.get("scholarships", []):
+        sch_id = sch.get("id")
+        if sch.get("institution_id") not in institution_ids:
+            errors.append(f"Scholarship '{sch_id}' references invalid institution_id '{sch.get('institution_id')}'")
+        if not sch.get("name"):
+            errors.append(f"Scholarship '{sch_id}' missing required 'name'")
+        if not sch.get("coverage_details"):
+            errors.append(f"Scholarship '{sch_id}' missing required 'coverage_details'")
+        if sch.get("source_url") and not is_valid_url(sch.get("source_url")):
+            errors.append(f"Scholarship '{sch_id}' has invalid source_url: '{sch.get('source_url')}'")
+        if sch.get("official_application_url") and not is_valid_url(sch.get("official_application_url")):
+            errors.append(f"Scholarship '{sch_id}' has invalid official_application_url: '{sch.get('official_application_url')}'")
+        if sch.get("last_checked_at") and not is_valid_date(sch.get("last_checked_at")):
+            errors.append(f"Scholarship '{sch_id}' has invalid last_checked_at date: '{sch.get('last_checked_at')}'")
+
+    # 11. Country Guidance (Phase 2 P2-12)
+    for cg in data.get("country_guidance", []):
+        ccode = cg.get("country_code")
+        if ccode not in country_ids:
+            errors.append(f"Country guidance references unknown country_code '{ccode}'")
+        if not cg.get("overview_text"):
+            errors.append(f"Country guidance for '{ccode}' missing 'overview_text'")
+        if cg.get("visa_authority_url") and not is_valid_url(cg.get("visa_authority_url")):
+            errors.append(f"Country guidance for '{ccode}' has invalid visa_authority_url: '{cg.get('visa_authority_url')}'")
+
     # Summary
     print(f"[*] Total Institutions verified: {len(data.get('institutions', []))}")
     print(f"[*] Total Programmes verified: {len(data.get('programmes', []))}")
     print(f"[*] Total Eligibility Rules verified: {len(data.get('eligibility_rules', []))}")
     print(f"[*] Total Admission Cycles verified: {len(data.get('admissions', []))}")
     print(f"[*] Total Fee Records verified: {len(data.get('fee_records', []))}")
+    print(f"[*] Total Scholarships verified: {len(data.get('scholarships', []))}")
+    print(f"[*] Total Country Guidance profiles verified: {len(data.get('country_guidance', []))}")
 
     if warnings:
         print(f"\n[!] {len(warnings)} Warnings:")

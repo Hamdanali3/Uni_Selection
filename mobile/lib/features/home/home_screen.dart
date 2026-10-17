@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/repositories/uniselection_repository.dart';
 import '../../core/models/institution.dart';
+import '../../core/models/recommendation_result.dart';
 import '../institutions/institution_detail_screen.dart';
+import '../scholarships/scholarship_finder_screen.dart';
+import '../planner/application_planner_screen.dart';
+import '../calendar/admissions_calendar_screen.dart';
+import '../international/country_guidance_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final UniSelectionRepository repository;
@@ -16,12 +21,101 @@ class HomeScreen extends StatelessWidget {
     required this.onSelectCategory,
   });
 
+  void _showRecommendationBreakdown(BuildContext context, RecommendationResult rec) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    rec.institutionName,
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryContainer.withAlpha(50),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${rec.totalScore.toStringAsFixed(0)}% MATCH',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.secondary),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Deterministic Score Breakdown (No Generative Black-Box AI)',
+              style: TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
+            const Divider(height: 20),
+            ...rec.factors.map((f) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(f.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                          Text(
+                            '${f.score.toStringAsFixed(0)} / ${f.maxScore.toStringAsFixed(0)} pts',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(f.explanation, style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary)),
+                    ],
+                  ),
+                )),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  final inst = repository.getInstitutionById(rec.institutionId);
+                  if (inst != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => InstitutionDetailScreen(
+                          institution: inst,
+                          repository: repository,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('View University Profile'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isNational = repository.activeScope == 'national';
     final institutions = repository.getInstitutions();
     final categories = repository.categories;
     final admissions = repository.admissions;
+    final recommendations = repository.getPersonalizedRecommendations();
 
     return Scaffold(
       appBar: AppBar(
@@ -146,7 +240,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Quick Search / Explore Action
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -154,7 +247,7 @@ class HomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    onPressed: () => onNavigateTab(1), // Go to Institutions tab
+                    onPressed: () => onNavigateTab(1),
                     icon: const Icon(Icons.search, size: 18),
                     label: const Text(
                       'Browse All Institutions',
@@ -165,34 +258,151 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // Quick Shortcut Row: Eligibility & Comparison
+            // Phase 2 Strategic Feature Hub
             Row(
               children: [
                 Expanded(
                   child: _buildActionCard(
-                    icon: Icons.rule_folder_rounded,
-                    title: 'Eligibility Guidance',
-                    subtitle: 'Check against published criteria',
+                    icon: Icons.stars_rounded,
+                    title: 'Scholarships & Aid',
+                    subtitle: 'Find verified funding',
                     color: AppColors.secondary,
-                    onTap: () => onNavigateTab(2), // Eligibility tab
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ScholarshipFinderScreen(repository: repository),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildActionCard(
-                    icon: Icons.compare_arrows_rounded,
-                    title: 'Compare Options',
-                    subtitle: 'Side-by-side analysis',
+                    icon: Icons.checklist_rtl_rounded,
+                    title: 'Application Tracker',
+                    subtitle: 'Milestones & checklists',
+                    color: Colors.teal,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ApplicationPlannerScreen(repository: repository),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildActionCard(
+                    icon: Icons.calendar_month_rounded,
+                    title: 'Admissions Calendar',
+                    subtitle: 'Upcoming deadlines',
+                    color: AppColors.primary,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AdmissionsCalendarScreen(repository: repository),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionCard(
+                    icon: Icons.public_rounded,
+                    title: 'Country Guidance',
+                    subtitle: 'Visas & global intakes',
                     color: AppColors.tertiary,
-                    onTap: () => onNavigateTab(3), // Shortlist tab
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CountryGuidanceScreen(repository: repository),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
 
             const SizedBox(height: 24),
+
+            // P2-03 Personalized Recommendations Section
+            if (recommendations.isNotEmpty) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Recommended for You',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    'Transparent Matching',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.secondary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ...recommendations.take(3).map((rec) {
+                final inst = repository.getInstitutionById(rec.institutionId);
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.primaryContainer.withAlpha(40),
+                      child: Text(
+                        inst?.shortName?.substring(0, 1) ?? rec.institutionName.substring(0, 1),
+                        style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary),
+                      ),
+                    ),
+                    title: Text(
+                      rec.institutionName,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondaryContainer.withAlpha(50),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            rec.matchLabel.toUpperCase(),
+                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: AppColors.secondary),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('${rec.totalScore.toStringAsFixed(0)}% Score',
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.info_outline_rounded, size: 20, color: AppColors.textSecondary),
+                    onTap: () => _showRecommendationBreakdown(context, rec),
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
+            ],
 
             // Academic Disciplines / Categories Section
             Row(
@@ -243,7 +453,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               ...admissions.take(2).map((adm) {
                 final inst = repository.getInstitutionById(adm.institutionId);
-                return _buildAdmissionCard(adm.sessionName, inst?.name ?? '', adm.admissionStatus, adm.closingDate);
+                return _buildAdmissionCard(adm.sessionName, inst?.name ?? '', adm.admissionStatus, adm.closingDate ?? 'Rolling');
               }),
               const SizedBox(height: 24),
             ],
@@ -320,8 +530,8 @@ class HomeScreen extends StatelessWidget {
         side: const BorderSide(color: AppColors.border),
       ),
       child: InkWell(
-        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -333,24 +543,17 @@ class HomeScreen extends StatelessWidget {
                   color: color.withAlpha(30),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: color, size: 22),
+                child: Icon(icon, color: color, size: 20),
               ),
               const SizedBox(height: 10),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.textSecondary,
-                ),
+                style: const TextStyle(fontSize: 10.5, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -360,131 +563,84 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildCategoryChip(String name, String slug, VoidCallback onTap) {
-    IconData icon;
-    if (slug.contains('eng')) {
-      icon = Icons.engineering_rounded;
-    } else if (slug.contains('comp')) {
-      icon = Icons.computer_rounded;
-    } else if (slug.contains('med')) {
-      icon = Icons.local_hospital_rounded;
-    } else if (slug.contains('biz')) {
-      icon = Icons.business_center_rounded;
-    } else if (slug.contains('sci')) {
-      icon = Icons.science_rounded;
-    } else {
-      icon = Icons.menu_book_rounded;
-    }
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 110,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: AppColors.primary, size: 24),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          width: 100,
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(_getCategoryIcon(slug), color: AppColors.primary, size: 28),
+              const SizedBox(height: 8),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAdmissionCard(String session, String uniName, String status, String? deadline) {
-    Color statusColor;
-    if (status == 'Open') {
-      statusColor = AppColors.statusOpen;
-    } else if (status == 'Upcoming') {
-      statusColor = AppColors.statusUpcoming;
-    } else {
-      statusColor = AppColors.statusClosed;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withAlpha(30),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              status.toUpperCase(),
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+  Widget _buildAdmissionCard(String session, String instName, String status, String deadline) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.secondary.withAlpha(30),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  session,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                ),
-                Text(
-                  uniName,
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                ),
-              ],
-            ),
-          ),
-          if (deadline != null) ...[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text('Deadline', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                Text(
-                  deadline,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          ],
-        ],
+          child: const Icon(Icons.alarm, color: AppColors.secondary, size: 20),
+        ),
+        title: Text(
+          session,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          '$instName • $status • Deadline: $deadline',
+          style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+        ),
       ),
     );
   }
 
   Widget _buildInstitutionCard(BuildContext context, Institution inst) {
     final city = repository.getCity(inst.cityId);
-    final isShortlisted = repository.isInstitutionShortlisted(inst.id);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        leading: CircleAvatar(
+          backgroundColor: AppColors.primaryContainer,
+          child: Text(
+            inst.shortName?.substring(0, 1) ?? inst.name.substring(0, 1),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
+        ),
+        title: Text(
+          inst.name,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          '${city?.name ?? inst.countryId} • ${inst.institutionType}',
+          style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+        ),
+        trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.textSecondary),
         onTap: () {
           Navigator.push(
             context,
@@ -496,65 +652,28 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         },
-        leading: CircleAvatar(
-          backgroundColor: AppColors.primaryContainer,
-          child: Text(
-            inst.shortName?.substring(0, 1) ?? inst.name.substring(0, 1),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-          ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                inst.name,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-            if (inst.hecRecognized) ...[
-              const Icon(Icons.verified, color: AppColors.verifiedBadge, size: 16),
-            ],
-          ],
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: Row(
-            children: [
-              const Icon(Icons.location_on, size: 13, color: AppColors.textSecondary),
-              const SizedBox(width: 3),
-              Text(
-                city?.name ?? inst.countryId,
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  inst.institutionType,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            isShortlisted ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
-            color: isShortlisted ? AppColors.secondary : AppColors.textSecondary,
-          ),
-          onPressed: () {
-            repository.toggleInstitutionShortlist(inst.id);
-          },
-        ),
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String slug) {
+    switch (slug.toLowerCase()) {
+      case 'engineering':
+      case 'eng':
+        return Icons.precision_manufacturing_rounded;
+      case 'medical':
+      case 'med':
+        return Icons.medical_services_rounded;
+      case 'computer-science':
+      case 'cs':
+      case 'it':
+        return Icons.computer_rounded;
+      case 'business':
+      case 'bba':
+        return Icons.trending_up_rounded;
+      case 'general':
+      default:
+        return Icons.menu_book_rounded;
+    }
   }
 }
