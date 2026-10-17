@@ -11,9 +11,14 @@ import '../models/eligibility_rule.dart';
 import '../models/admission.dart';
 import '../models/fee_record.dart';
 import '../models/scholarship.dart';
+import '../models/application_plan.dart';
+import '../models/country_guidance.dart';
+import '../models/recommendation_result.dart';
 import '../services/dataset_loader.dart';
 import '../services/local_storage_service.dart';
 import '../services/remote_api_service.dart';
+import '../services/recommendation_service.dart';
+import '../services/notification_service.dart';
 
 export '../services/remote_api_service.dart' show BackendSyncStatus;
 
@@ -21,17 +26,26 @@ class UniSelectionRepository extends ChangeNotifier {
   final DatasetLoader _loader;
   final LocalStorageService _storage;
   final RemoteApiService _remoteApi;
+  late final RecommendationService _recommendationService;
+  late final NotificationService _notificationService;
 
   UniSelectionRepository({
     DatasetLoader? loader,
     LocalStorageService? storage,
     RemoteApiService? remoteApi,
+    RecommendationService? recommendationService,
+    NotificationService? notificationService,
   })  : _loader = loader ?? DatasetLoader(),
         _storage = storage ?? LocalStorageService(),
-        _remoteApi = remoteApi ?? RemoteApiService();
+        _remoteApi = remoteApi ?? RemoteApiService() {
+    _recommendationService = recommendationService ?? RecommendationService();
+    _notificationService = notificationService ?? NotificationService(storage: _storage);
+  }
 
   RemoteApiService get remoteApi => _remoteApi;
   LocalStorageService get storage => _storage;
+  RecommendationService get recommendationService => _recommendationService;
+  NotificationService get notificationService => _notificationService;
 
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
@@ -53,6 +67,7 @@ class UniSelectionRepository extends ChangeNotifier {
   List<Admission> _admissions = [];
   List<FeeRecord> _feeRecords = [];
   List<Scholarship> _scholarships = [];
+  List<CountryGuidance> _countryGuidances = [];
   List<Map<String, dynamic>> _syncRuns = [];
   List<Map<String, dynamic>> _reviewQueue = [];
 
@@ -67,17 +82,20 @@ class UniSelectionRepository extends ChangeNotifier {
   List<Admission> get admissions => _admissions;
   List<FeeRecord> get feeRecords => _feeRecords;
   List<Scholarship> get scholarships => _scholarships;
+  List<CountryGuidance> get countryGuidances => _countryGuidances;
   List<Map<String, dynamic>> get syncRuns => _syncRuns;
   List<Map<String, dynamic>> get reviewQueue => _reviewQueue;
 
   String get activeScope => _storage.selectedScope;
   bool get hasCompletedOnboarding => _storage.hasCompletedOnboarding;
   Map<String, dynamic> get userProfile => _storage.userProfile;
+  List<ApplicationPlan> get applicationPlans => _storage.applicationPlans;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     await _storage.init();
+    await _notificationService.init();
 
     Map<String, dynamic>? data;
 
@@ -158,6 +176,11 @@ class UniSelectionRepository extends ChangeNotifier {
             .toList() ??
         [];
 
+    _countryGuidances = (data['country_guidance'] as List<dynamic>?)
+            ?.map((e) => CountryGuidance.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
+
     _syncRuns = (data['sync_runs'] as List<dynamic>?)
             ?.map((e) => Map<String, dynamic>.from(e as Map))
             .toList() ??
@@ -169,9 +192,229 @@ class UniSelectionRepository extends ChangeNotifier {
         [];
   }
 
+  // ── P2-01 Scholarships Finder & Management ───────────────────────────────────
+
   List<Scholarship> getScholarshipsForInstitution(String institutionId) {
     return _scholarships.where((s) => s.institutionId == institutionId).toList();
   }
+
+  List<Scholarship> getScholarships({
+    String? query,
+    String? institutionId,
+    ScholarshipFundingType? fundingType,
+    ScholarshipCoverageType? coverageType,
+    String? country,
+    String? degreeLevel,
+    String? discipline,
+    bool hideClosed = false,
+    bool hideStale = false,
+  }) {
+    return _scholarships.where((s) {
+      if (institutionId != null && s.institutionId != institutionId) {
+        return false;
+      }
+      if (fundingType != null && s.fundingType != fundingType) {
+        return false;
+      }
+      if (coverageType != null && s.coverageType != coverageType) {
+        return false;
+      }
+      if (country != null && country.isNotEmpty && s.country != null && s.country != 'ALL') {
+        if (s.country!.toLowerCase() != country.toLowerCase()) {
+          return false;
+        }
+      }
+      if (degreeLevel != null && degreeLevel.isNotEmpty && s.degreeLevels.isNotEmpty) {
+        if (!s.degreeLevels.any((lvl) => lvl.toLowerCase() == degreeLevel.toLowerCase())) {
+          return false;
+        }
+      }
+      if (discipline != null && discipline.isNotEmpty && s.discipline != null) {
+        if (!s.discipline!.toLowerCase().contains(discipline.toLowerCase())) {
+          return false;
+        }
+      }
+      if (hideClosed && s.isDeadlinePassed) {
+        return false;
+      }
+      if (hideStale && s.isStale) {
+        return false;
+      }
+      if (query != null && query.trim().isNotEmpty) {
+        final q = query.trim().toLowerCase();
+        final matchName = s.name.toLowerCase().contains(q);
+        final matchProvider = s.providerName?.toLowerCase().contains(q) ?? false;
+        final matchCoverage = s.coverageDetails.toLowerCase().contains(q);
+        final inst = getInstitutionById(s.institutionId);
+        final matchInst = inst != null &&
+            (inst.name.toLowerCase().contains(q) ||
+                (inst.shortName?.toLowerCase().contains(q) ?? false));
+        if (!matchName && !matchProvider && !matchCoverage && !matchInst) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
+  Scholarship? getScholarshipById(String id) {
+    try {
+      return _scholarships.firstWhere((s) => s.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool isScholarshipShortlisted(String id) =>
+      _storage.shortlistedScholarshipIds.contains(id);
+
+  Future<void> toggleScholarshipShortlist(String id) async {
+    await _storage.toggleScholarshipShortlist(id);
+    notifyListeners();
+  }
+
+  List<Scholarship> getShortlistedScholarships() {
+    return _scholarships
+        .where((s) => _storage.shortlistedScholarshipIds.contains(s.id))
+        .toList();
+  }
+
+  // ── P2-03 Transparent Personalized Recommendations ──────────────────────────
+
+  List<RecommendationResult> getPersonalizedRecommendations() {
+    final activeInsts = getInstitutions();
+    return _recommendationService.rankInstitutions(
+      institutions: activeInsts,
+      programmes: _programmes,
+      eligibilityRules: _eligibilityRules,
+      studentProfile: _storage.userProfile,
+    );
+  }
+
+  // ── P2-04 Application Planner & Tracker (Local-only) ─────────────────────────
+
+  Future<ApplicationPlan> createApplicationPlan({
+    required String institutionId,
+    String? programmeId,
+    String? targetSession,
+  }) async {
+    final inst = getInstitutionById(institutionId);
+    final prog = programmeId != null ? getProgrammeById(programmeId) : null;
+    final nowIso = DateTime.now().toIso8601String();
+    final planId = 'plan-${DateTime.now().millisecondsSinceEpoch}';
+
+    // Seed default baseline milestones/tasks for student
+    final defaultTasks = [
+      ApplicationTask(
+        id: '$planId-task-1',
+        planId: planId,
+        title: 'Review Published Eligibility Criteria & Prerequisite Subjects',
+        category: TaskCategory.documents,
+        status: TaskStatus.completed,
+        createdAt: nowIso,
+        completedAt: nowIso,
+      ),
+      ApplicationTask(
+        id: '$planId-task-2',
+        planId: planId,
+        title: 'Prepare Attested Transcripts & Identity Verification',
+        category: TaskCategory.documents,
+        status: TaskStatus.pending,
+        createdAt: nowIso,
+      ),
+      ApplicationTask(
+        id: '$planId-task-3',
+        planId: planId,
+        title: 'Register & Complete Required Entry Test / Entrance Assessment',
+        category: TaskCategory.test,
+        status: TaskStatus.pending,
+        createdAt: nowIso,
+      ),
+      ApplicationTask(
+        id: '$planId-task-4',
+        planId: planId,
+        title: 'Submit Online Application Form via Official Admissions Portal',
+        category: TaskCategory.application,
+        status: TaskStatus.pending,
+        createdAt: nowIso,
+      ),
+      ApplicationTask(
+        id: '$planId-task-5',
+        planId: planId,
+        title: 'Track Merit List Announcement & Confirm Fee Voucher Details',
+        category: TaskCategory.financial,
+        status: TaskStatus.pending,
+        createdAt: nowIso,
+      ),
+    ];
+
+    final plan = ApplicationPlan(
+      id: planId,
+      institutionId: institutionId,
+      programmeId: programmeId,
+      institutionName: inst?.name ?? 'Target Institution',
+      programmeName: prog?.name,
+      targetSession: targetSession ?? 'Fall 2026',
+      applicationUrl: inst?.admissionsUrl,
+      createdAt: nowIso,
+      tasks: defaultTasks,
+    );
+
+    await _storage.saveApplicationPlan(plan);
+    notifyListeners();
+    return plan;
+  }
+
+  Future<void> deleteApplicationPlan(String planId) async {
+    await _storage.deleteApplicationPlan(planId);
+    notifyListeners();
+  }
+
+  Future<void> addApplicationTask({
+    required String planId,
+    required String title,
+    String? description,
+    TaskCategory category = TaskCategory.other,
+    String? dueDateIso,
+  }) async {
+    final nowIso = DateTime.now().toIso8601String();
+    final task = ApplicationTask(
+      id: 'task-${DateTime.now().millisecondsSinceEpoch}',
+      planId: planId,
+      title: title,
+      description: description,
+      category: category,
+      dueDateIso: dueDateIso,
+      status: TaskStatus.pending,
+      createdAt: nowIso,
+    );
+    await _storage.updateApplicationTask(planId, task);
+    notifyListeners();
+  }
+
+  Future<void> updateApplicationTask(String planId, ApplicationTask task) async {
+    await _storage.updateApplicationTask(planId, task);
+    notifyListeners();
+  }
+
+  Future<void> deleteApplicationTask(String planId, String taskId) async {
+    await _storage.deleteApplicationTask(planId, taskId);
+    notifyListeners();
+  }
+
+  // ── P2-12 Bounded International Country Guidance ─────────────────────────────
+
+  CountryGuidance? getCountryGuidance(String countryCode) {
+    try {
+      return _countryGuidances.firstWhere(
+        (c) => c.countryCode.toUpperCase() == countryCode.toUpperCase(),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Editorial & Discrepancy Reporting (P2-08 & P2-09) ─────────────────────────
 
   void approveReviewItem(String reviewId) {
     final idx = _reviewQueue.indexWhere((item) => item['id'] == reviewId);
@@ -189,14 +432,14 @@ class UniSelectionRepository extends ChangeNotifier {
     }
   }
 
-  void submitUserDiscrepancyReport({
+  Future<void> submitUserDiscrepancyReport({
     required String entityId,
     required String entityType,
     required String fieldName,
     required String reportedValue,
     required String notes,
-  }) {
-    _reviewQueue.insert(0, {
+  }) async {
+    final reportMap = {
       'id': 'user-rep-${DateTime.now().millisecondsSinceEpoch}',
       'entity_id': entityId,
       'entity_type': entityType,
@@ -207,8 +450,17 @@ class UniSelectionRepository extends ChangeNotifier {
       'diff_reason': 'User Reported Discrepancy: $notes',
       'created_at': DateTime.now().toIso8601String(),
       'status': 'pending',
-    });
+    };
+
+    _reviewQueue.insert(0, reportMap);
     notifyListeners();
+
+    // Cloud submission fallback
+    if (_remoteApi.isConfigured) {
+      try {
+        await _remoteApi.submitDiscrepancyReport(reportMap);
+      } catch (_) {}
+    }
   }
 
   Future<void> retryBackendSync() async {
@@ -301,7 +553,7 @@ class UniSelectionRepository extends ChangeNotifier {
         }
       }
 
-      // 6. Keyword Query (Matches name, acronym, city, or offered programmes/disciplines)
+      // 6. Keyword Query
       if (query != null && query.trim().isNotEmpty) {
         final q = query.trim().toLowerCase();
         final matchName = inst.name.toLowerCase().contains(q);
@@ -521,7 +773,7 @@ class UniSelectionRepository extends ChangeNotifier {
     }
   }
 
-  // Admin / Editorial Summary
+  // Admin / Editorial Summary & Data Quality Dashboard (P2-11)
   Map<String, dynamic> getVerificationSummary() {
     final totalInst = _institutions.length;
     final publishedInst =
@@ -534,6 +786,8 @@ class UniSelectionRepository extends ChangeNotifier {
     final totalRules = _eligibilityRules.length;
     final totalAdmissions = _admissions.length;
     final totalFees = _feeRecords.length;
+    final totalScholarships = _scholarships.length;
+    final totalGuidance = _countryGuidances.length;
 
     // Detect stale records (> 180 days since lastVerifiedAt)
     final now = DateTime.now();
@@ -563,6 +817,8 @@ class UniSelectionRepository extends ChangeNotifier {
       'totalEligibilityRules': totalRules,
       'totalAdmissionCycles': totalAdmissions,
       'totalFeeRecords': totalFees,
+      'totalScholarships': totalScholarships,
+      'totalCountryGuidance': totalGuidance,
       'verificationRate': totalInst == 0
           ? 100.0
           : ((publishedInst / totalInst) * 100).toStringAsFixed(1),

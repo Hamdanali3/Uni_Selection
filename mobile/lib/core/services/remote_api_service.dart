@@ -43,6 +43,8 @@ class RemoteApiService {
         _get('$baseUrl/rest/v1/eligibility_rules?select=*', timeout),
         _get('$baseUrl/rest/v1/admissions?select=*', timeout),
         _get('$baseUrl/rest/v1/fee_records?select=*', timeout),
+        _get('$baseUrl/rest/v1/scholarships?status=eq.published&select=*', timeout),
+        _get('$baseUrl/rest/v1/country_guidance?select=*', timeout),
       ]);
 
       return {
@@ -56,9 +58,38 @@ class RemoteApiService {
         'eligibility_rules': results[7],
         'admissions': results[8],
         'fee_records': results[9],
+        'scholarships': results[10],
+        'country_guidance': results[11],
       };
     } catch (e) {
       rethrow;
+    }
+  }
+
+  /// Submits a user discrepancy report to Supabase PostgREST endpoint (Phase 2 P2-08)
+  Future<bool> submitDiscrepancyReport(Map<String, dynamic> report) async {
+    if (!AppConfig.isSupabaseConfigured) {
+      return false;
+    }
+
+    final baseUrl = AppConfig.supabaseUrl.replaceAll(RegExp(r'/+$'), '');
+    final uri = Uri.parse('$baseUrl/rest/v1/discrepancy_reports');
+
+    try {
+      final response = await _client
+          .post(
+            uri,
+            headers: {
+              ..._headers,
+              'Prefer': 'return=minimal',
+            },
+            body: jsonEncode(report),
+          )
+          .timeout(Duration(seconds: AppConfig.apiTimeoutSeconds));
+
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (_) {
+      return false;
     }
   }
 
