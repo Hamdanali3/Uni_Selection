@@ -1,7 +1,7 @@
 # UniSelection — Test Plan & Quality Assurance Strategy
 
-**Version:** 2.0 (Updated with Phase 1 verified execution results)  
-**Scope Reference:** Section 14 & Section 16 of `UniSelection_Phase_1_Master_Scope_v1.2.md`  
+**Version:** 2.1 (Updated with Phase 1 v1.3 M23 Data Intelligence verified execution results)  
+**Scope Reference:** Section 14 & Section 16 of `UniSelection_Phase_1_Master_Scope_v1.3.md`  
 **Last Execution:** October 2026 — Branch `audit-and-fixes`
 
 This document details the multi-tiered quality assurance strategy for UniSelection Phase 1. See `docs/phase-1-test-results.md` for the complete verified execution output and screenshot evidence.
@@ -17,7 +17,7 @@ This document details the multi-tiered quality assurance strategy for UniSelecti
 | **Widget Tests** | UI Cards, Filters, Empty/Error/Loading states | `flutter_test` | All core screens & reusable components | ✅ 6/6 tests passed |
 | **Integration Tests** | End-to-end user journeys (Search → Shortlist → Compare) | Flutter Driver / Integration Test | Critical P0 flows | ✅ 8 journeys verified on `emulator-5554` |
 | **Database RLS Tests** | Anonymous read, cross-user write denial, admin lock | Schema audit + RLS policy review | 100% of RLS policies | ✅ 15/15 tables reviewed |
-| **Data Validation** | CSV template verification, FK integrity, URL format | Python (`validate_dataset.py`) | 100% of import records | ✅ 0 errors across 39 institutions |
+| **Data Validation** | CSV template verification, FK integrity, URL format | Python (`validate_dataset.py`) | 100% of import records | ✅ 0 errors across 284 institutions |
 
 ---
 
@@ -112,6 +112,21 @@ APK install on device  → Success (emulator-5554, Pixel 10 Pro API 37)
   5. Re-publish NUST → metrics revert to 100.0%, Published (39).
 - **Pass Criteria:** Metrics recompute reactively; SnackBar confirms each mutation.
 - **Phase 1 Result:** ✅ PASS — Screenshots: `emulator_26_status_mutated.png`, `emulator_27_republished.png`
+
+---
+
+### Journey 6: M23 Automated Data Sync, Provenance & Admin Review Queue
+- **Steps:**
+  1. Open Settings -> inspect M23 Data Intelligence Engine card (ACTIVE, 284 institutions, HEC+ROR sources).
+  2. Navigate to University Directory -> inspect 266 HEC Recognized Pakistani institutions + 18 Global benchmarks.
+  3. Open Institution Detail (e.g. Abdul Wali Khan University) -> inspect Verified Provenance & Freshness card (100% confidence, audit timestamp).
+  4. Tap Flag icon / Report Issue -> submit student crowdsourced discrepancy report.
+  5. Swipe TabBar -> inspect Scholarships tab empty state and portal link.
+  6. Open Admin Review Console -> inspect Live Sync Run stats and Pending Change Proposals queue.
+  7. Tap Approve on change proposal -> verify item removed from queue and counter decrements.
+  8. Tap Reject on change proposal -> verify item rejected and counter decrements.
+- **Pass Criteria:** 0 mutations on idempotent re-sync; live review queue supports approve/reject; discrepancy reports route to queue.
+- **Phase 1 v1.3 Result:** ✅ PASS — Screenshots: m23_universities_list.png, m23_institution_detail.png, m23_discrepancy_dialog.png, m23_settings_diagnostics.png, m23_admin_review_items.png, m23_admin_item_approved_ok.png, m23_admin_item_rejected_ok.png
 
 ---
 

@@ -10,6 +10,7 @@ import '../models/programme.dart';
 import '../models/eligibility_rule.dart';
 import '../models/admission.dart';
 import '../models/fee_record.dart';
+import '../models/scholarship.dart';
 import '../services/dataset_loader.dart';
 import '../services/local_storage_service.dart';
 import '../services/remote_api_service.dart';
@@ -51,6 +52,9 @@ class UniSelectionRepository extends ChangeNotifier {
   List<EligibilityRule> _eligibilityRules = [];
   List<Admission> _admissions = [];
   List<FeeRecord> _feeRecords = [];
+  List<Scholarship> _scholarships = [];
+  List<Map<String, dynamic>> _syncRuns = [];
+  List<Map<String, dynamic>> _reviewQueue = [];
 
   List<Country> get countries => _countries;
   List<City> get cities => _cities;
@@ -62,6 +66,9 @@ class UniSelectionRepository extends ChangeNotifier {
   List<EligibilityRule> get eligibilityRules => _eligibilityRules;
   List<Admission> get admissions => _admissions;
   List<FeeRecord> get feeRecords => _feeRecords;
+  List<Scholarship> get scholarships => _scholarships;
+  List<Map<String, dynamic>> get syncRuns => _syncRuns;
+  List<Map<String, dynamic>> get reviewQueue => _reviewQueue;
 
   String get activeScope => _storage.selectedScope;
   bool get hasCompletedOnboarding => _storage.hasCompletedOnboarding;
@@ -145,6 +152,63 @@ class UniSelectionRepository extends ChangeNotifier {
             ?.map((e) => FeeRecord.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
+
+    _scholarships = (data['scholarships'] as List<dynamic>?)
+            ?.map((e) => Scholarship.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [];
+
+    _syncRuns = (data['sync_runs'] as List<dynamic>?)
+            ?.map((e) => Map<String, dynamic>.from(e as Map))
+            .toList() ??
+        [];
+
+    _reviewQueue = (data['review_queue'] as List<dynamic>?)
+            ?.map((e) => Map<String, dynamic>.from(e as Map))
+            .toList() ??
+        [];
+  }
+
+  List<Scholarship> getScholarshipsForInstitution(String institutionId) {
+    return _scholarships.where((s) => s.institutionId == institutionId).toList();
+  }
+
+  void approveReviewItem(String reviewId) {
+    final idx = _reviewQueue.indexWhere((item) => item['id'] == reviewId);
+    if (idx != -1) {
+      _reviewQueue[idx]['status'] = 'approved';
+      notifyListeners();
+    }
+  }
+
+  void rejectReviewItem(String reviewId) {
+    final idx = _reviewQueue.indexWhere((item) => item['id'] == reviewId);
+    if (idx != -1) {
+      _reviewQueue[idx]['status'] = 'rejected';
+      notifyListeners();
+    }
+  }
+
+  void submitUserDiscrepancyReport({
+    required String entityId,
+    required String entityType,
+    required String fieldName,
+    required String reportedValue,
+    required String notes,
+  }) {
+    _reviewQueue.insert(0, {
+      'id': 'user-rep-${DateTime.now().millisecondsSinceEpoch}',
+      'entity_id': entityId,
+      'entity_type': entityType,
+      'field_name': fieldName,
+      'old_value': '',
+      'new_value': reportedValue,
+      'risk_level': 'medium',
+      'diff_reason': 'User Reported Discrepancy: $notes',
+      'created_at': DateTime.now().toIso8601String(),
+      'status': 'pending',
+    });
+    notifyListeners();
   }
 
   Future<void> retryBackendSync() async {

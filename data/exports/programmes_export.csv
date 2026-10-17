@@ -1,0 +1,15 @@
+id,institution_id,campus_id,name,degree_level,discipline_id,duration_years,study_mode,official_url,last_verified_at
+prog-nust-cs,nust,cmp-nust-isb,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://seecs.nust.edu.pk/program/bs-computer-science,2026-09-20
+prog-nust-se,nust,cmp-nust-isb,BS Software Engineering,Undergraduate,disc-se,4.0,Full-Time,https://seecs.nust.edu.pk/program/bs-software-engineering,2026-09-20
+prog-nust-ee,nust,cmp-nust-isb,BE Electrical Engineering,Undergraduate,disc-ee,4.0,Full-Time,https://seecs.nust.edu.pk/program/be-electrical-engineering,2026-09-20
+prog-lums-cs,lums,cmp-lums-dha,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://sbasse.lums.edu.pk/department/computer-science,2026-09-18
+prog-lums-bba,lums,cmp-lums-dha,BSc (Honours) Management Science,Undergraduate,disc-bba,4.0,Full-Time,https://sdsb.lums.edu.pk/undergraduate-programmes,2026-09-18
+prog-giki-ai,giki,cmp-giki-topi,BS Artificial Intelligence,Undergraduate,disc-ai,4.0,Full-Time,https://giki.edu.pk/faculty-of-computer-sciences-and-engineering,2026-09-15
+prog-fast-cs,fast-nu,cmp-fast-isb,BS Computer Science,Undergraduate,disc-cs,4.0,Full-Time,https://nu.edu.pk/Program/BS(CS),2026-09-22
+prog-fast-se,fast-nu,cmp-fast-lhr,BS Software Engineering,Undergraduate,disc-se,4.0,Full-Time,https://nu.edu.pk/Program/BS(SE),2026-09-22
+prog-aku-mbbs,aku,,"Bachelor of Medicine, Bachelor of Surgery (MBBS)",Undergraduate,disc-mbbs,5.0,Full-Time,https://www.aku.edu/mcpk/programmes/undergraduate/mbbs,2026-09-12
+prog-iba-bba,iba-karachi,cmp-iba-main,BBA (Bachelor of Business Administration),Undergraduate,disc-bba,4.0,Full-Time,https://iba.edu.pk/program-bba.php,2026-09-19
+prog-uet-me,uet-lahore,cmp-uet-lhr,BSc Mechanical Engineering,Undergraduate,disc-me,4.0,Full-Time,https://uet.edu.pk/faculties/facultiesinfo/mechanical_engineering,2026-09-20
+prog-oxf-cs,oxford,,BA (Hons) Computer Science,Undergraduate,disc-cs,3.0,Full-Time,https://www.ox.ac.uk/admissions/undergraduate/courses/course-listing/computer-science,2026-09-01
+prog-cam-eng,cambridge,,BA (Hons) Engineering,Undergraduate,disc-ee,4.0,Full-Time,https://www.undergraduate.study.cam.ac.uk/courses/engineering,2026-09-01
+prog-tum-cs,tum,,B.Sc. Informatics (Computer Science),Undergraduate,disc-cs,3.0,Full-Time,https://www.tum.de/en/studies/degree-programs/detail/informatics-bachelor-of-science-bsc,2026-09-02

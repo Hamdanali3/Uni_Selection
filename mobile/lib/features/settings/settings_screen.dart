@@ -67,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Phase 1 MVP • Version 1.0.0 (v1.2 Baseline)',
+                        'Phase 1 MVP • Version 1.0.0 (v1.3 — M23 Data Intelligence)',
                         style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                       ),
                     ],
@@ -120,12 +120,22 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.storage_rounded, color: AppColors.tertiary),
                   title: const Text('Local Starter Dataset', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                  subtitle: const Text('39 institutions • 14 programmes • 100% cited', style: TextStyle(fontSize: 12)),
+                  subtitle: const Text('284 institutions • 11 campuses • 14 programmes • 100% cited', style: TextStyle(fontSize: 12)),
                   trailing: const Icon(Icons.check_circle, color: AppColors.verifiedBadge, size: 18),
                 ),
               ],
             ),
           ),
+
+          const SizedBox(height: 20),
+
+          // M23 — Data Freshness & Provenance Engine
+          const Text(
+            'M23 — Data Intelligence Engine',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          _M23DiagnosticsCard(repository: repository),
 
           const SizedBox(height: 20),
 
@@ -299,6 +309,146 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 28),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M23 — Data Freshness & Provenance Engine diagnostics card.
+// Surfaces key sync-engine stats from the repository layer without
+// requiring a live Supabase connection.
+// ---------------------------------------------------------------------------
+class _M23DiagnosticsCard extends StatelessWidget {
+  final UniSelectionRepository repository;
+
+  const _M23DiagnosticsCard({required this.repository});
+
+  @override
+  Widget build(BuildContext context) {
+    final syncRuns = repository.syncRuns;
+    final latestRun = syncRuns.isNotEmpty ? syncRuns.last : null;
+    final pendingCount = repository.reviewQueue.length;
+
+    final lastSyncLabel = latestRun != null
+        ? '${latestRun['source'] ?? 'HEC+ROR'} — ${latestRun['timestamp'] ?? 'unknown'}'
+        : 'No sync run recorded this session';
+
+    final mutationsLabel = latestRun != null
+        ? '${latestRun['mutations'] ?? 0} mutation(s) • ${latestRun['new_records'] ?? 0} new record(s)'
+        : 'Run sync engine to populate';
+
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.sync_rounded, color: AppColors.primary),
+            title: const Text('Sync Engine Status', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            subtitle: Text(lastSyncLabel, style: const TextStyle(fontSize: 12)),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.green.withAlpha(30),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'ACTIVE',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.green),
+              ),
+            ),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.hub_rounded, color: AppColors.tertiary),
+            title: const Text('Covered Sources', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            subtitle: const Text(
+              'HEC Pakistan (266) • ROR Global (18) • 14 countries',
+              style: TextStyle(fontSize: 12),
+            ),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.update_rounded, color: AppColors.secondary),
+            title: const Text('Last Run Results', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            subtitle: Text(mutationsLabel, style: const TextStyle(fontSize: 12)),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: Icon(
+              pendingCount > 0 ? Icons.rate_review_rounded : Icons.check_circle_outline_rounded,
+              color: pendingCount > 0 ? AppColors.secondary : AppColors.verifiedBadge,
+            ),
+            title: const Text('Pending Change Review Queue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            subtitle: Text(
+              pendingCount > 0
+                  ? '$pendingCount item(s) awaiting admin approval'
+                  : 'No pending items — queue is clean',
+              style: const TextStyle(fontSize: 12),
+            ),
+            trailing: pendingCount > 0
+                ? Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withAlpha(30),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '$pendingCount',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.orange),
+                    ),
+                  )
+                : null,
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sync CLI Commands (Python)',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 6),
+                _cliRow('Full sync', 'python -m data.sync.cli run-sync'),
+                _cliRow('Idempotency test', 'python -m data.sync.cli test-idempotency'),
+                _cliRow('Change detection test', 'python -m data.sync.cli test-change-detection'),
+                _cliRow('Validate dataset', 'python data/validation/validate_dataset.py'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cliRow(String label, String command) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('›  ', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w700)),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                children: [
+                  TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                  TextSpan(
+                    text: command,
+                    style: const TextStyle(fontFamily: 'monospace', color: AppColors.primary),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

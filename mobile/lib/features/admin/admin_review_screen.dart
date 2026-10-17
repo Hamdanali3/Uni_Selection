@@ -284,11 +284,273 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
             ),
           ),
 
+          const SizedBox(height: 16),
+
+          // M23 — Sync Intelligence & Review Queue
+          const Text(
+            'Sync Intelligence & Live Change Queue',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 10),
+
+          // Sync Runs Summary
+          Builder(
+            builder: (context) {
+              final syncRuns = widget.repository.syncRuns;
+              final pendingQueue = widget.repository.reviewQueue
+                  .where((item) => item['status'] == 'pending')
+                  .toList();
+              final latestRun = syncRuns.isNotEmpty ? syncRuns.first : null;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Latest Sync Run Card
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.sync_rounded, color: AppColors.primary, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Latest Automated Sync Run',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (latestRun != null) ...[
+                          _buildSyncMetricRow('Status', latestRun['status'] ?? 'unknown'),
+                          _buildSyncMetricRow('Records Discovered', '${latestRun['records_discovered'] ?? 0}'),
+                          _buildSyncMetricRow('Institutions Active', '${latestRun['records_ingested'] ?? 0}'),
+                          _buildSyncMetricRow('Records Updated', '${latestRun['records_updated'] ?? 0}'),
+                          _buildSyncMetricRow('Change Proposals', '${latestRun['change_proposals_created'] ?? 0}'),
+                          _buildSyncMetricRow('Run ID', '${(latestRun['id'] ?? '').toString().substring(0, 8)}...'),
+                        ] else ...[
+                          const Text(
+                            'No sync runs recorded. Run:\npython -m data.sync.cli sync',
+                            style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Pending Review Queue
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: pendingQueue.isNotEmpty ? const Color(0xFFF59E0B) : AppColors.border,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.pending_actions_rounded,
+                              color: pendingQueue.isNotEmpty ? const Color(0xFFF59E0B) : AppColors.textSecondary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Change Review Queue (${pendingQueue.length} pending)',
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (pendingQueue.isEmpty)
+                          const Text(
+                            '✓ All change proposals reviewed — no items pending.',
+                            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                          )
+                        else
+                          ...pendingQueue.take(8).map((item) => _buildReviewQueueItem(item)),
+                        if (pendingQueue.length > 8)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              '+ ${pendingQueue.length - 8} more items pending review',
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+
           const SizedBox(height: 24),
         ],
       ),
     );
   }
+
+  Widget _buildSyncMetricRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary)),
+          Text(value, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewQueueItem(Map<String, dynamic> item) {
+    final riskLevel = item['risk_level'] as String? ?? 'medium';
+    Color riskColor;
+    switch (riskLevel) {
+      case 'critical':
+        riskColor = const Color(0xFFDC2626);
+        break;
+      case 'high':
+        riskColor = const Color(0xFFF59E0B);
+        break;
+      case 'medium':
+        riskColor = AppColors.secondary;
+        break;
+      default:
+        riskColor = AppColors.textSecondary;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(10),
+        border: Border(left: BorderSide(color: riskColor, width: 4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: riskColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  riskLevel.toUpperCase(),
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: riskColor),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${item['field_name'] ?? 'unknown'} — ${item['entity_id'] ?? ''}',
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            item['diff_reason'] as String? ?? '',
+            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          ),
+          if ((item['old_value'] as String?)?.isNotEmpty == true) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEE2E2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'OLD: ${item['old_value']}',
+                      style: const TextStyle(fontSize: 10, color: Color(0xFF991B1B)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDCFCE7),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'NEW: ${item['new_value']}',
+                      style: const TextStyle(fontSize: 10, color: Color(0xFF166534)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFDC2626),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  visualDensity: VisualDensity.compact,
+                ),
+                icon: const Icon(Icons.close_rounded, size: 14),
+                label: const Text('Reject', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                onPressed: () {
+                  widget.repository.rejectReviewItem(item['id'] as String);
+                  setState(() {});
+                },
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF16A34A),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  visualDensity: VisualDensity.compact,
+                ),
+                icon: const Icon(Icons.check_rounded, size: 14),
+                label: const Text('Approve', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                onPressed: () {
+                  widget.repository.approveReviewItem(item['id'] as String);
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // (existing methods follow)
+
 
   Widget _buildFilterChip(String label, String value) {
     final isSelected = _selectedFilter == value;

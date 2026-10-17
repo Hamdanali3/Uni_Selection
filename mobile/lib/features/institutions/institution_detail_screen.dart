@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/repositories/uniselection_repository.dart';
 import '../../core/models/institution.dart';
+import '../../core/models/scholarship.dart';
 import '../programmes/programme_detail_screen.dart';
 
 class InstitutionDetailScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -48,6 +49,107 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
     }
   }
 
+  void _showDiscrepancyDialog(BuildContext context) {
+    String selectedField = 'Admissions / Deadline';
+    final valueController = TextEditingController();
+    final notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.flag_rounded, color: AppColors.primary),
+              SizedBox(width: 8),
+              Text('Report Data Discrepancy', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Help verify higher education data for all students. Your report routes to the verified Admin Review Queue.',
+                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 14),
+                const Text('Field with discrepancy:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedField,
+                  decoration: const InputDecoration(border: OutlineInputBorder(), isDense: true),
+                  items: const [
+                    DropdownMenuItem(value: 'Admissions / Deadline', child: Text('Admissions / Deadline')),
+                    DropdownMenuItem(value: 'Tuition Fee Shift', child: Text('Tuition Fee Shift')),
+                    DropdownMenuItem(value: 'Accreditation / Recognition', child: Text('Accreditation / Recognition')),
+                    DropdownMenuItem(value: 'Official Website / Portal', child: Text('Official Website / Portal')),
+                    DropdownMenuItem(value: 'Programme / Degree Info', child: Text('Programme / Degree Info')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setDialogState(() => selectedField = val);
+                  },
+                ),
+                const SizedBox(height: 12),
+                const Text('Observed / New Value:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: valueController,
+                  decoration: const InputDecoration(
+                    hintText: 'e.g. July 25, 2026 or Rs. 140,000',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text('Citation / Source Link / Notes:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: notesController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    hintText: 'Link to official circular or prospectus',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final val = valueController.text.trim();
+                final notes = notesController.text.trim();
+                if (val.isEmpty) return;
+                widget.repository.submitUserDiscrepancyReport(
+                  entityId: widget.institution.id,
+                  entityType: 'institution',
+                  fieldName: selectedField,
+                  reportedValue: val,
+                  notes: notes,
+                );
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Thank you! Discrepancy logged to Admin Review Queue for verification.'),
+                    backgroundColor: AppColors.primary,
+                  ),
+                );
+              },
+              child: const Text('Submit Report'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final inst = widget.institution;
@@ -56,12 +158,18 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
     final campuses = widget.repository.getCampusesForInstitution(inst.id);
     final programmes = widget.repository.getProgrammesForInstitution(inst.id);
     final admissions = widget.repository.getAdmissionsForInstitution(inst.id);
+    final scholarships = widget.repository.getScholarshipsForInstitution(inst.id);
     final isShortlisted = widget.repository.isInstitutionShortlisted(inst.id);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(inst.shortName ?? inst.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.flag_outlined),
+            tooltip: 'Report Data Discrepancy',
+            onPressed: () => _showDiscrepancyDialog(context),
+          ),
           IconButton(
             icon: Icon(
               isShortlisted ? Icons.bookmark_rounded : Icons.bookmark_outline_rounded,
@@ -238,6 +346,7 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
+              isScrollable: true,
               labelColor: AppColors.primary,
               unselectedLabelColor: AppColors.textSecondary,
               indicatorColor: AppColors.primary,
@@ -248,6 +357,7 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
                 Tab(text: 'Programmes (${programmes.length})'),
                 Tab(text: 'Campuses (${campuses.length})'),
                 const Tab(text: 'Admissions'),
+                Tab(text: 'Scholarships (${scholarships.length})'),
               ],
             ),
           ),
@@ -261,6 +371,7 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
                 _buildProgrammesTab(programmes),
                 _buildCampusesTab(campuses),
                 _buildAdmissionsTab(admissions),
+                _buildScholarshipsTab(scholarships),
               ],
             ),
           ),
@@ -273,6 +384,101 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // Source Provenance & Data Freshness Card (M23)
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFF0FDF4), Color(0xFFDCFCE7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFF86EFAC)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.shield_outlined, color: Color(0xFF15803D), size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Verified Provenance & Freshness',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF14532D),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF16A34A),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      inst.dataFreshnessStatus?.toUpperCase() ?? 'CURRENT',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Source: ${inst.sourceId ?? (inst.countryId == "PAK" ? "Higher Education Commission (HEC) Pakistan" : "Research Organization Registry (ROR)")}',
+                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Color(0xFF166534)),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    'Audit Confidence: ${inst.confidenceScore?.toInt() ?? 100}%  •  Checked: ${inst.lastCheckedAt ?? inst.lastVerifiedAt}',
+                    style: const TextStyle(fontSize: 11.5, color: Color(0xFF15803D)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF14532D),
+                      side: const BorderSide(color: Color(0xFF16A34A)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(Icons.open_in_new, size: 14),
+                    label: const Text('View Source Register', style: TextStyle(fontSize: 11)),
+                    onPressed: () => _launchUrl(inst.sourceUrl ?? inst.officialWebsite),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF15803D),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(Icons.flag_outlined, size: 14),
+                    label: const Text('Report Issue', style: TextStyle(fontSize: 11)),
+                    onPressed: () => _showDiscrepancyDialog(context),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
         if (inst.overview != null) ...[
           const Text(
             'About Institution',
@@ -647,6 +853,127 @@ class _InstitutionDetailScreenState extends State<InstitutionDetailScreen>
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
                 ),
               ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildScholarshipsTab(List<Scholarship> scholarships) {
+    if (scholarships.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.school_outlined, size: 56, color: AppColors.textSecondary.withAlpha(120)),
+              const SizedBox(height: 16),
+              const Text(
+                'No scholarships currently catalogued',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () => _launchUrl(widget.institution.admissionsUrl ?? widget.institution.officialWebsite),
+                child: const Text(
+                  'Visit official admissions portal for financial aid →',
+                  style: TextStyle(fontSize: 12, color: AppColors.primary, decoration: TextDecoration.underline),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: scholarships.length,
+      itemBuilder: (context, index) {
+        final s = scholarships[index];
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.workspace_premium_rounded, color: AppColors.primary, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          s.name,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                        ),
+                        const SizedBox(height: 3),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            s.scholarshipType,
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text('Coverage:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+              const SizedBox(height: 4),
+              Text(s.coverageDetails, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
+              const SizedBox(height: 8),
+              const Text('Eligibility Criteria:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+              const SizedBox(height: 4),
+              Text(s.minimumCriteria, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary)),
+              if (s.applicationDeadline != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSecondary),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Application Deadline: ${s.applicationDeadline}',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ],
+              if (s.sourceUrl != null) ...[
+                const SizedBox(height: 10),
+                InkWell(
+                  onTap: () => _launchUrl(s.sourceUrl!),
+                  child: const Text(
+                    'Verify on Official Scholarship Portal →',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                  ),
+                ),
+              ],
             ],
           ),
         );

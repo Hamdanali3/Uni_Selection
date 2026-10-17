@@ -16,6 +16,11 @@ class Institution {
   final List<String> categoryIds;
   final String lastVerifiedAt;
   final String status;
+  final String? sourceId;
+  final String? sourceUrl;
+  final String? lastCheckedAt;
+  final double? confidenceScore;
+  final String? dataFreshnessStatus;
 
   const Institution({
     required this.id,
@@ -35,6 +40,11 @@ class Institution {
     required this.categoryIds,
     required this.lastVerifiedAt,
     this.status = 'published',
+    this.sourceId,
+    this.sourceUrl,
+    this.lastCheckedAt,
+    this.confidenceScore,
+    this.dataFreshnessStatus,
   });
 
   factory Institution.fromJson(Map<String, dynamic> json) {
@@ -60,6 +70,11 @@ class Institution {
           [],
       lastVerifiedAt: json['last_verified_at'] as String? ?? '',
       status: json['status'] as String? ?? 'published',
+      sourceId: json['source_id'] as String?,
+      sourceUrl: json['source_url'] as String?,
+      lastCheckedAt: json['last_checked_at'] as String?,
+      confidenceScore: (json['confidence_score'] as num?)?.toDouble(),
+      dataFreshnessStatus: json['data_freshness_status'] as String?,
     );
   }
 
@@ -81,5 +96,10 @@ class Institution {
     'category_ids': categoryIds,
     'last_verified_at': lastVerifiedAt,
     'status': status,
+    'source_id': sourceId,
+    'source_url': sourceUrl,
+    'last_checked_at': lastCheckedAt,
+    'confidence_score': confidenceScore,
+    'data_freshness_status': dataFreshnessStatus,
   };
 }

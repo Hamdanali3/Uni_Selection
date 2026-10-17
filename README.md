@@ -6,21 +6,24 @@ Built strictly according to the **Phase 1 Master Scope Document (v1.2)**.
 
 ---
 
-## ✅ Phase 1 MVP — Verified & Release-Ready
+## ✅ Phase 1 MVP (v1.3 Baseline) — Module M23 Global Data Intelligence
 
-**Audit Branch:** `audit-and-fixes` | **Audit Date:** October 2026
+**Branch:** `feat/m23-global-data-intelligence` | **Release Version:** `v1.3` | **Audit Date:** October 2026
 
 | Metric | Result |
 |---|---|
 | `flutter analyze` | **0 issues** |
 | `flutter test` | **22/22 tests passed** |
-| `python data/validation/validate_dataset.py` | **0 errors — 39 institutions, 14 programmes** |
-| Android Emulator Journeys (`emulator-5554`) | **8/8 journeys verified** |
-| Phase 1 Modules (M1–M22) | **22/22 PASS** |
-| Defects Resolved | **15/15** |
+| `pytest tests/test_sync_engine.py` | **10/10 unit tests passed** |
+| `python -m data.sync.cli test-idempotency` | **0 mutations / 0 diffs on re-sync (PASSED)** |
+| `python data/validation/validate_dataset.py` | **0 errors — 284 institutions, 11 campuses, 14 programmes** |
+| Android Emulator Journeys (`emulator-5554`) | **Verified on Android API 37 with 11 screenshot artifacts** |
+| Total Institutional Coverage | **284 institutions (266 HEC Recognized Pakistan + 18 Global)** |
+| Statutory Citation / Provenance Rate | **100.0% verified sources** |
+| Phase 1 Modules (M1–M23) | **23/23 PASS** |
 | Release Blockers | **0** |
 
-> See [`docs/phase-1-release-readiness.md`](docs/phase-1-release-readiness.md) for full Go/No-Go decision and evidence.
+> See [`docs/phase-1-data-sync-release-readiness.md`](docs/phase-1-data-sync-release-readiness.md) and [`docs/phase-1-data-sync-test-results.md`](docs/phase-1-data-sync-test-results.md) for full Go/No-Go decisions and evidence logs.
 
 ---
 
@@ -61,7 +64,17 @@ Built strictly according to the **Phase 1 Master Scope Document (v1.2)**.
    - [`docs/phase-1-test-results.md`](docs/phase-1-test-results.md) — **NEW** Complete test execution output & screenshot evidence
    - [`docs/phase-1-bug-fix-log.md`](docs/phase-1-bug-fix-log.md) — **NEW** 15 defects with root causes & regression evidence
    - [`docs/phase-1-api-and-data-report.md`](docs/phase-1-api-and-data-report.md) — **NEW** API, RLS, dataset, and accreditation report
-   - [`docs/phase-1-release-readiness.md`](docs/phase-1-release-readiness.md) — **NEW** Go/No-Go readiness with 58-item checklist
+    - [docs/phase-1-release-readiness.md](docs/phase-1-release-readiness.md) — Go/No-Go readiness with 58-item checklist
+    - [docs/global-data-coverage-report.md](docs/global-data-coverage-report.md) — **M23** Institutional coverage metrics across 284 institutions & 14 nations
+    - [docs/phase-1-data-sync-test-results.md](docs/phase-1-data-sync-test-results.md) — **M23** Sync CLI, pytest, flutter test, and emulator test results
+    - [docs/phase-1-data-sync-bug-fix-log.md](docs/phase-1-data-sync-bug-fix-log.md) — **M23** Defect log covering idempotency, deduplication, and schema fixes
+    - [docs/phase-1-data-sync-release-readiness.md](docs/phase-1-data-sync-release-readiness.md) — **M23** Go/No-Go readiness verdict and release gates
+    - [docs/change-detection-and-review-workflow.md](docs/change-detection-and-review-workflow.md) — **M23** Human-in-the-loop review workflow & classification matrix
+    - [docs/global-data-source-registry.md](docs/global-data-source-registry.md) — **M23** Approved data sources, statutory bodies, and update cadence
+    - [docs/global-data-sync-design.md](docs/global-data-sync-design.md) — **M23** Technical specification for data ingestion & sync engine
+    - [docs/global-university-data-architecture.md](docs/global-university-data-architecture.md) — **M23** Target system architecture for global intelligence
+    - [docs/data-quality-and-provenance.md](docs/data-quality-and-provenance.md) — **M23** Quality assurance standards, provenance scoring, and audit trails
+    - [docs/data-licensing-and-crawl-policy.md](docs/data-licensing-and-crawl-policy.md) — **M23** Lawful crawling, rate limiting, and attribution compliance
 
 ---
 

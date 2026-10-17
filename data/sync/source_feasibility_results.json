@@ -1,0 +1,181 @@
+[
+  {
+    "id": "eduvision",
+    "name": "Eduvision Pakistan",
+    "url": "https://www.eduvision.edu.pk/",
+    "category": "Aggregator (Pakistan)",
+    "expected_role": "Discovery / Cross-checking",
+    "tested_at": "2026-10-17T08:31:43.006579Z",
+    "http_status": 200,
+    "robots_status": 200,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "text/html; charset=UTF-8",
+    "response_time_ms": 1198.2,
+    "notes": [
+      "Robots.txt has 1 global/root disallow rules",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "vision_edu",
+    "name": "Vision University / Web",
+    "url": "https://www.vision.edu/web/",
+    "category": "Institutional Portal (Single Institution)",
+    "expected_role": "Individual Institution Website (Not a General Directory)",
+    "tested_at": "2026-10-17T08:31:44.852116Z",
+    "http_status": 200,
+    "robots_status": 200,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "text/html; charset=UTF-8",
+    "response_time_ms": 2085.6,
+    "notes": [
+      "Robots.txt has 1 global/root disallow rules",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "eduhubpak",
+    "name": "EduHub Pakistan",
+    "url": "https://eduhubpak.com/",
+    "category": "Aggregator (Pakistan)",
+    "expected_role": "Discovery / Candidate URLs",
+    "tested_at": "2026-10-17T08:31:48.260441Z",
+    "http_status": 200,
+    "robots_status": 200,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "text/html; charset=utf-8",
+    "response_time_ms": 1473.4,
+    "notes": [
+      "Robots.txt has 1 global/root disallow rules",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "pakunifinder",
+    "name": "PakUniFinder",
+    "url": "https://www.pakunifinder.com/",
+    "category": "Aggregator (Pakistan)",
+    "expected_role": "Discovery / Candidate URLs",
+    "tested_at": "2026-10-17T08:31:51.141001Z",
+    "http_status": 200,
+    "robots_status": 200,
+    "robots_allows": true,
+    "has_etag": true,
+    "has_last_modified": true,
+    "content_type": "text/html; charset=utf-8",
+    "response_time_ms": 525.2,
+    "notes": [
+      "Robots.txt has 1 global/root disallow rules",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "hec_campuses",
+    "name": "HEC Recognized Campuses",
+    "url": "https://www.hec.gov.pk/english/universities/Pages/DAIs/HEC-recognized-Campuses.aspx",
+    "category": "Statutory Authority (Pakistan)",
+    "expected_role": "Statutory Campus Recognition Authority",
+    "tested_at": "2026-10-17T08:31:52.475475Z",
+    "http_status": 200,
+    "robots_status": 404,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": true,
+    "content_type": "text/html; charset=utf-8",
+    "response_time_ms": 388.7,
+    "notes": [
+      "Robots.txt returned HTTP 404",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "hec_accreditation",
+    "name": "HEC Accreditation Section",
+    "url": "https://www.hec.gov.pk/english/services/universities/Pages/Accreditation.aspx",
+    "category": "Statutory Authority (Pakistan)",
+    "expected_role": "Statutory Institutional Accreditation Policy",
+    "tested_at": "2026-10-17T08:31:53.798753Z",
+    "http_status": 404,
+    "robots_status": 404,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "text/html; charset=utf-8",
+    "response_time_ms": 367.4,
+    "notes": [
+      "Robots.txt returned HTTP 404",
+      "Returned unexpected HTTP status: 404"
+    ]
+  },
+  {
+    "id": "hec_foreign_heis",
+    "name": "HEC Foreign HEIs Recognition Procedure",
+    "url": "https://www.hec.gov.pk/english/services/students/DES/Pages/Procedure/Foreign-HEIs.aspx",
+    "category": "Statutory Authority (Pakistan)",
+    "expected_role": "Statutory Foreign Recognition Criteria",
+    "tested_at": "2026-10-17T08:31:54.473508Z",
+    "http_status": 200,
+    "robots_status": 404,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": true,
+    "content_type": "text/html; charset=utf-8",
+    "response_time_ms": 382.8,
+    "notes": [
+      "Robots.txt returned HTTP 404",
+      "Endpoint reachable and returning 200 OK",
+      "HTML page content verified"
+    ]
+  },
+  {
+    "id": "ror_api",
+    "name": "Research Organization Registry (ROR) API",
+    "url": "https://api.ror.org/v2/organizations?query=National%20University%20of%20Sciences",
+    "category": "Open Global Registry (International)",
+    "expected_role": "Global Institution Discovery & Persistent Identifiers (ROR ID)",
+    "tested_at": "2026-10-17T08:31:55.137249Z",
+    "http_status": 200,
+    "robots_status": 429,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "application/json",
+    "response_time_ms": 1163.9,
+    "notes": [
+      "Robots.txt returned HTTP 429",
+      "Endpoint reachable and returning 200 OK",
+      "Structured JSON API response verified"
+    ]
+  },
+  {
+    "id": "openalex_api",
+    "name": "OpenAlex Institutions API",
+    "url": "https://api.openalex.org/institutions?search=NUST&per-page=3",
+    "category": "Open Scholarly Registry (International)",
+    "expected_role": "Global Institution Discovery & Persistent Identifiers (OpenAlex ID)",
+    "tested_at": "2026-10-17T08:31:56.856158Z",
+    "http_status": 200,
+    "robots_status": 200,
+    "robots_allows": true,
+    "has_etag": false,
+    "has_last_modified": false,
+    "content_type": "application/json",
+    "response_time_ms": 3077.4,
+    "notes": [
+      "Robots.txt has 43 global/root disallow rules",
+      "Endpoint reachable and returning 200 OK",
+      "Structured JSON API response verified"
+    ]
+  }
+]

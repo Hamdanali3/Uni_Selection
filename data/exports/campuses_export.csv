@@ -1,0 +1,12 @@
+id,institution_id,name,city_id,is_main_campus,hec_recognized
+cmp-nust-isb,nust,Main Campus Sector H-12,c-isb,True,True
+cmp-lums-dha,lums,Main DHA Campus,c-lhr,True,True
+cmp-giki-topi,giki,Topi Main Residential Campus,c-topi,True,True
+cmp-fast-isb,fast-nu,Islamabad H-9 Campus,c-isb,True,True
+cmp-fast-lhr,fast-nu,Lahore Faisal Town Campus,c-lhr,False,True
+cmp-fast-khi,fast-nu,Karachi Main Campus,c-khi,False,True
+cmp-cui-isb,comsats,Islamabad Park Road Campus,c-isb,True,True
+cmp-cui-lhr,comsats,Lahore Defence Road Campus,c-lhr,False,True
+cmp-cui-abt,comsats,Abbottabad Campus,c-abt,False,True
+cmp-uet-lhr,uet-lahore,GT Road Main Campus,c-lhr,True,True
+cmp-iba-main,iba-karachi,University Road Main Campus,c-khi,True,True
